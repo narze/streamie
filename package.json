@@ -1,6 +1,9 @@
 {
   "name": "streamie",
   "version": "1.0.0",
+  "engines": {
+    "node": "16.x"
+  },
   "main": "index.js",
   "repository": "ssh://git@github.com/narze/streamie",
   "author": "Manassarn Manoonchai <manassarn@gmail.com>",
