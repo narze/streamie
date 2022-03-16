@@ -3,7 +3,9 @@ const { Client, Collection, Intents } = require("discord.js")
 require("dotenv").config()
 
 // Create a new client instance
-const client = new Client({ intents: [Intents.FLAGS.GUILDS] })
+const client = new Client({
+  intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES],
+})
 
 client.commands = new Collection()
 
@@ -39,6 +41,13 @@ client.on("interactionCreate", async (interaction) => {
       ephemeral: true,
     })
   }
+})
+
+// Intents.FLAGS.GUILD_MESSAGES
+client.on("messageCreate", async (msg) => {
+  if (msg.author.bot) return
+
+  console.log("received message", `${msg.author.tag}: ${msg.content}`)
 })
 
 // Login to Discord with your client's token
