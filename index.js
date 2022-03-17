@@ -2,6 +2,7 @@ const fs = require("node:fs")
 const { Client, Collection, Intents } = require("discord.js")
 require("dotenv").config()
 require("./ping-server")
+require("./twitch")
 
 // Create a new client instance
 const client = new Client({
