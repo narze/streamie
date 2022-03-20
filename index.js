@@ -50,6 +50,10 @@ client.on("messageCreate", async (msg) => {
   if (msg.author.bot) return
 
   console.log("received message", `${msg.author.tag}: ${msg.content}`)
+
+  if (msg.content.match(/^ping/i)) {
+    msg.channel.send("Pong!")
+  }
 })
 
 // Login to Discord with your client's token
