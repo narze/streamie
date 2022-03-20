@@ -3,9 +3,11 @@ FROM node:16-alpine
 # Set working directory
 WORKDIR /app
 
+ENV NODE_ENV production
+
 # Add package.json to WORKDIR and install dependencies
-COPY package*.json ./
-RUN npm install
+COPY package.json yarn.lock ./
+RUN yarn
 
 # Add source code files to WORKDIR
 COPY . .
