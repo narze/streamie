@@ -2,7 +2,7 @@
   "name": "streamie",
   "version": "1.0.0",
   "engines": {
-    "node": "16.x"
+    "node": ">=16"
   },
   "main": "index.js",
   "repository": "ssh://git@github.com/narze/streamie",
