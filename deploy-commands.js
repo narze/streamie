@@ -1,7 +1,7 @@
 const fs = require("node:fs")
 const { REST } = require("@discordjs/rest")
 const { Routes } = require("discord-api-types/v9")
-require("dotenv").config()
+require("dotenv-flow").config()
 
 const { clientId, guildId, token } = {
   clientId: process.env.OAUTH_CLIENT_ID,

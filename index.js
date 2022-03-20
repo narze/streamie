@@ -1,6 +1,6 @@
 const fs = require("node:fs")
 const { Client, Collection, Intents } = require("discord.js")
-require("dotenv").config()
+require("dotenv-flow").config()
 require("./ping-server")
 require("./twitch")
 
