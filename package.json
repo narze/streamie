@@ -9,7 +9,8 @@
   "author": "Manassarn Manoonchai <manassarn@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "start": "node ."
+    "start": "node .",
+    "deploy-commands": "node deploy-commands"
   },
   "dependencies": {
     "@discordjs/builders": "^0.12.0",
