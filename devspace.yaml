@@ -3,7 +3,7 @@ version: v1beta11
 # `vars` specifies variables which may be used as ${VAR_NAME} in devspace.yaml
 vars:
   - name: IMAGE
-    value: ghcr.io/narze/streamie/app
+    value: ghcr.io/narze/streamie/streamie
   - name: DEVSPACE_PROFILE
     value: ${devspace.profile}
 
