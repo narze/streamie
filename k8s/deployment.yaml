@@ -5,9 +5,9 @@ metadata:
   labels:
     app: streamie
 spec:
-  # selector:
-  #   matchLabels:
-  #     octopusexport: OctopusExport
+  selector:
+    matchLabels:
+      app: streamie
   replicas: 1
   # strategy:
   #   type: RollingUpdate
