@@ -4,3 +4,10 @@ namespace: streamie
 resources:
   - ./deployment.yaml
   - ./service.yaml
+secretGenerator:
+  - name: streamie
+    literals:
+      - TWITCH_OAUTH_TOKEN=dummy_value
+      - OAUTH_CLIENT_ID=dummy_value
+      - DISCORD_TOKEN=dummy_value
+      - DEV_GUILD_ID=dummy_value
