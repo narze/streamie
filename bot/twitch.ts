@@ -1,4 +1,4 @@
-const tmi = require("tmi.js")
+import tmi from "tmi.js"
 const client = new tmi.Client({
   options: { debug: true, messagesLogLevel: "info" },
   connection: {

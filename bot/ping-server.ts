@@ -1,9 +1,9 @@
-const http = require("http")
+import http from "http"
 
 const host = "localhost"
-const port = +process.env.PORT || 3000
+const port = +process.env.PORT! || 3000
 
-const requestListener = function (req, res) {
+const requestListener = function (_req: any, res: any) {
   res.setHeader("Content-Type", "text/html")
   res.writeHead(200)
   res.end(`<html><body><h1>OK</h1></body></html>`)

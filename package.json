@@ -7,6 +7,7 @@
   "private": "true",
   "scripts": {
     "start": "yarn bot start",
+    "dev": "yarn bot dev",
     "bot": "yarn workspace bot"
   },
   "workspaces": [
