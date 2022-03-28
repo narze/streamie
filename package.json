@@ -8,9 +8,11 @@
   "scripts": {
     "start": "yarn bot start",
     "dev": "yarn bot dev",
-    "bot": "yarn workspace bot"
+    "bot": "yarn workspace bot",
+    "web": "yarn workspace web"
   },
   "workspaces": [
-    "bot"
+    "bot",
+    "web"
   ]
 }

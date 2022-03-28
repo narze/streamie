@@ -1,6 +1,5 @@
 import fs from "node:fs"
 import { Client, Collection, Intents } from "discord.js"
-import dotenvFlow from "dotenv-flow"
 
 import type { SlashCommandBuilder } from "@discordjs/builders"
 // import type { SendEmbed } from "./lib/MessageEmbed"
@@ -17,8 +16,6 @@ declare module "discord.js" {
     send(options: string | MessagePayload | MessageOptions): Promise<Message>
   }
 }
-
-dotenvFlow.config()
 
 export default function discord() {
   // Create a new client instance
