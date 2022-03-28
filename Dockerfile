@@ -20,7 +20,7 @@ EXPOSE 3000
 EXPOSE 9229
 
 # Container start command (DO NOT CHANGE and see note below)
-CMD ["npm", "start"]
+CMD ["yarn", "start"]
 
 # To start using a different `npm run [name]` command (e.g. to use nodemon + debugger),
 # edit devspace.yaml:
