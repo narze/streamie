@@ -5,6 +5,8 @@
   import { onMount } from "svelte"
 
   let messages = []
+  let autoread = false
+  let clicked = false
 
   onMount(() => {
     const socket = io("ws://localhost:8080")
@@ -18,19 +20,38 @@
       console.log({ args })
     })
 
-    socket.on("message", ({ message }) => {
-      console.log({ message })
-      messages = [...messages, message]
+    socket.on("message", ({ message, username }) => {
+      messages = [...messages, `${username}: ${message}`]
+
+      if (autoread) {
+        read(message)
+      }
     })
   })
+
+  function read(message: string) {
+    new Audio(`https://tts-api.vercel.app/api/tts?text=${message}&lang=th-TH`).play()
+  }
 </script>
 
 <MainFullVh class="p-4">
   <Middle class="p-8 border rounded-xl">
-    <h1 class="text-3xl">Sample Overlay</h1>
+    <h1 class="text-3xl">ReadME</h1>
+
+    <p>
+      {#if !clicked}
+        <button on:click={() => (clicked = autoread = true)} class="btn">
+          Click me to activate autoreading
+        </button>
+      {:else}
+        <button on:click={() => (autoread = !autoread)} class="btn">
+          Autoread : {autoread ? "🔊" : "🔇"}
+        </button>
+      {/if}
+    </p>
 
     {#each messages as message}
-      <p>{message}</p>
+      <p>{message} <button on:click={() => read(message)}>🔉</button></p>
     {/each}
   </Middle>
 </MainFullVh>

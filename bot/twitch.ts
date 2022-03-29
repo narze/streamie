@@ -25,7 +25,8 @@ export default function twitch(io: Server) {
       const sayMessage = message.split("!say")[1]
 
       io.sockets.emit("message", {
-        message: `@${tags.username}: ${sayMessage}`,
+        message: sayMessage,
+        username: tags.username,
       })
     }
   })
