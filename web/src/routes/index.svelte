@@ -21,7 +21,15 @@
   })
 
   function read(message: string) {
+    if (!canRead) {
+      return
+    }
+
     new Audio(`https://tts-api.vercel.app/api/tts?text=${message}&lang=th-TH`).play()
+  }
+
+  function canRead(message: string): boolean {
+    return message.length <= 200
   }
 </script>
 
@@ -42,7 +50,10 @@
     </p>
 
     {#each messages as message}
-      <p>{message} <button on:click={() => read(message)}>🔉</button></p>
+      <p>
+        {message}
+        <button on:click={() => read(message)}>🔉</button>
+      </p>
     {/each}
   </Middle>
 </MainFullVh>
