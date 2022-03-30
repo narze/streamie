@@ -22,12 +22,17 @@ export default function twitch(io: Server) {
     }
 
     if (message.toLowerCase().startsWith("!say")) {
-      const sayMessage = message.split("!say")[1]
+      const matches = message.match(/^!say(!(\w+))?\s(.+)$/)
 
-      io.sockets.emit("message", {
-        message: sayMessage,
-        username: tags.username,
-      })
+      if (matches) {
+        const [_0, _1, lang, msg] = matches
+
+        io.sockets.emit("message", {
+          message: msg,
+          username: tags.username,
+          language: lang,
+        })
+      }
     }
   })
 }
