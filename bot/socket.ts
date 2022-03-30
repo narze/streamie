@@ -3,7 +3,7 @@ import { Server } from "socket.io"
 export default function socket() {
   const io = new Server(8080, {
     cors: {
-      origin: "http://localhost:4000",
+      origin: "*",
       methods: ["GET", "POST"],
     },
   })
