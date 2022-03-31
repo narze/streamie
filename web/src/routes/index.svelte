@@ -11,21 +11,23 @@
   onMount(() => {
     const socket = io("ws://localhost:8080")
 
-    socket.on("message", ({ message, username, language }) => {
+    socket.on("message", ({ message, username, language, slow }) => {
       messages = [...messages, `${username}: ${message} (${language ?? "th"})`]
 
       if (autoread) {
-        read(message, language)
+        read(message, language, slow)
       }
     })
   })
 
-  function read(message: string, language: string = "th") {
+  function read(message: string, language: string = "th", slow: boolean = false) {
     if (!canRead) {
       return
     }
 
-    new Audio(`https://tts-api.vercel.app/api/tts?text=${message}&lang=${language}`).play()
+    new Audio(
+      `https://tts-api.vercel.app/api/tts?text=${message}&lang=${language}&slow=${slow ? "1" : ""}`
+    ).play()
   }
 
   function canRead(message: string): boolean {
