@@ -30,6 +30,7 @@
   "devDependencies": {
     "@types/dotenv-flow": "^3.2.0",
     "@types/tmi.js": "^1.8.1",
+    "axios": "^0.26.1",
     "dotenv-flow-cli": "^1.0.0",
     "eslint": "^8.11.0",
     "prisma": "^3.11.1"

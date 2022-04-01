@@ -1,6 +1,7 @@
 import tmi from "tmi.js"
 import { Server } from "socket.io"
 import prisma from "./prisma"
+import axios from "axios"
 
 export default function twitch(io: Server) {
   const client = new tmi.Client({
@@ -43,21 +44,15 @@ export default function twitch(io: Server) {
     if (message === "!register") {
       const name = tags.username!.toLowerCase()
 
-      await prisma.user.upsert({
-        create: {
-          name,
-        },
-        update: {},
-        where: {
-          name,
-        },
-      })
+      await upsertUser(name)
 
       client.say(channel, `@${tags.username} registered`)
     }
 
-    if (message == "!coin") {
+    if (message === "!coin") {
       const name = tags.username!.toLowerCase()
+
+      await upsertUser(name)
 
       const user = await prisma.user.findUnique({ where: { name } })
 
@@ -65,5 +60,56 @@ export default function twitch(io: Server) {
         client.say(channel, `@${tags.username} has ${user.coin} $OULONG`)
       }
     }
+
+    if (message === "!airdrop") {
+      const name = tags.username!.toLowerCase()
+
+      if (name !== "narzelive") {
+        return
+      }
+
+      const chattersResponse = await axios.get(
+        "https://tmi.twitch.tv/group/user/narzelive/chatters",
+        { responseType: "json" }
+      )
+
+      const viewers = chattersResponse.data.chatters.viewers
+
+      console.log({ viewers })
+
+      // Upsert user
+      await prisma.user.createMany({
+        data: viewers.map((v) => ({ name: v })),
+        skipDuplicates: true,
+      })
+
+      await prisma.user.updateMany({
+        data: {
+          coin: {
+            increment: 1,
+          },
+        },
+        where: {
+          name: { in: viewers },
+        },
+      })
+
+      client.say(
+        channel,
+        `@${tags.username} gives $OULONG to ${viewers.length} viewers!`
+      )
+    }
+  })
+}
+
+async function upsertUser(name: string) {
+  await prisma.user.upsert({
+    create: {
+      name,
+    },
+    update: {},
+    where: {
+      name,
+    },
   })
 }
