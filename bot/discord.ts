@@ -1,6 +1,5 @@
 import fs from "node:fs"
-import { Client, Collection, Intents } from "discord.js"
-import dotenvFlow from "dotenv-flow"
+import { Client, Collection, Intents, Interaction, Message } from "discord.js"
 
 import type { SlashCommandBuilder } from "@discordjs/builders"
 // import type { SendEmbed } from "./lib/MessageEmbed"
@@ -18,8 +17,6 @@ declare module "discord.js" {
   }
 }
 
-dotenvFlow.config()
-
 export default function discord() {
   // Create a new client instance
   const client = new Client({
@@ -30,7 +27,7 @@ export default function discord() {
 
   const commandFiles = fs
     .readdirSync("./commands")
-    .filter((file: string) => file.endsWith(".js"))
+    .filter((file: string) => file.endsWith(".ts"))
 
   for (const file of commandFiles) {
     const command = require(`./commands/${file}`)
@@ -44,7 +41,7 @@ export default function discord() {
     console.log("Ready!")
   })
 
-  client.on("interactionCreate", async (interaction: any) => {
+  client.on("interactionCreate", async (interaction: Interaction) => {
     if (!interaction.isCommand()) return
 
     const command = client.commands.get(interaction.commandName)
@@ -63,7 +60,7 @@ export default function discord() {
   })
 
   // Intents.FLAGS.GUILD_MESSAGES
-  client.on("messageCreate", async (msg: any) => {
+  client.on("messageCreate", async (msg: Message) => {
     if (msg.author.bot) return
 
     console.log("received message", `${msg.author.tag}: ${msg.content}`)

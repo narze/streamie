@@ -11,7 +11,7 @@
   "scripts": {
     "start": "ts-node .",
     "dev": "ts-node-dev .",
-    "deploy-commands": "node deploy-commands"
+    "deploy-commands": "ts-node deploy-commands"
   },
   "dependencies": {
     "@discordjs/builders": "^0.12.0",
@@ -19,6 +19,7 @@
     "discord-api-types": "^0.29.0",
     "discord.js": "^13.6.0",
     "dotenv-flow": "^3.2.0",
+    "socket.io": "^4.4.1",
     "tmi.js": "^1.8.5",
     "ts-node": "^10.7.0",
     "ts-node-dev": "^1.1.8",
