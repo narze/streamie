@@ -2,6 +2,8 @@ import tmi from "tmi.js"
 import { Server } from "socket.io"
 import prisma from "./prisma"
 import axios from "axios"
+import gacha from "./gacha"
+import { isError } from "./gacha"
 
 export default function twitch(io: Server) {
   const client = new tmi.Client({
@@ -92,6 +94,35 @@ export default function twitch(io: Server) {
         channel,
         `@${name} gives $OULONG to ${viewers.length} viewers!`
       )
+    }
+
+    if (message.startsWith("!gacha")) {
+      const [_, ...cmdArgs] = message.split(/\s+/)
+
+      let amount = 1
+
+      if (cmdArgs.length) {
+        let group = cmdArgs[0].match(/(-?\d+)/)
+        if (group && group[1]) {
+          amount = Number.parseInt(group[1])
+        }
+      }
+
+      const gachaResult = await gacha(name, amount)
+
+      if (!isError(gachaResult)) {
+        if (gachaResult.data.state == "win") {
+          await client.say(
+            channel,
+            `@${name} ลงทุน ${gachaResult.data.bet} -> ได้รางวัล ${gachaResult.data.win} $OULONG (${gachaResult.data.balance}).`
+          )
+        } else if (gachaResult.data.state == "lose") {
+          await client.say(
+            channel,
+            `@${name} ลงทุน ${gachaResult.data.bet} $OULONG -> แตก! (${gachaResult.data.balance}).`
+          )
+        }
+      }
     }
   })
 }
