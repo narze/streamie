@@ -40,7 +40,7 @@ export default function twitch(io: Server) {
       }
     }
 
-    if (message.startsWith("!register")) {
+    if (message === "!register") {
       const name = tags.username!.toLowerCase()
 
       await prisma.user.upsert({
@@ -54,6 +54,16 @@ export default function twitch(io: Server) {
       })
 
       client.say(channel, `@${tags.username} registered`)
+    }
+
+    if (message == "!coin") {
+      const name = tags.username!.toLowerCase()
+
+      const user = await prisma.user.findUnique({ where: { name } })
+
+      if (user) {
+        client.say(channel, `@${tags.username} has ${user.coin} $OULONG`)
+      }
     }
   })
 }
