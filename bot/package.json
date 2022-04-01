@@ -11,7 +11,7 @@
   "scripts": {
     "start": "ts-node .",
     "dev": "ts-node-dev .",
-    "deploy-commands": "node deploy-commands"
+    "deploy-commands": "ts-node deploy-commands"
   },
   "dependencies": {
     "@discordjs/builders": "^0.12.0",
