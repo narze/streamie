@@ -1,5 +1,6 @@
 import tmi from "tmi.js"
 import { Server } from "socket.io"
+import prisma from "./prisma"
 
 export default function twitch(io: Server) {
   const client = new tmi.Client({
@@ -14,9 +15,12 @@ export default function twitch(io: Server) {
     },
     channels: ["narzeLIVE"],
   })
+
   client.connect().catch(console.error)
-  client.on("message", (channel, tags, message, self) => {
+
+  client.on("message", async (channel, tags, message, self) => {
     if (self) return
+
     if (message.toLowerCase() === "!hello") {
       client.say(channel, `@${tags.username}, heya!`)
     }
@@ -34,6 +38,22 @@ export default function twitch(io: Server) {
           slow: !!slow,
         })
       }
+    }
+
+    if (message.startsWith("!register")) {
+      const name = tags.username!.toLowerCase()
+
+      await prisma.user.upsert({
+        create: {
+          name,
+        },
+        update: {},
+        where: {
+          name,
+        },
+      })
+
+      client.say(channel, `@${tags.username} registered`)
     }
   })
 }

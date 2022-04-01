@@ -2,10 +2,22 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["cockroachdb"]
 }
 
 datasource db {
-  provider = "postgresql"
+  // provider = "postgresql"{}
+  provider = "cockroachdb"
   url      = env("DATABASE_URL")
+}
+
+model User {
+  id   String @id(map: "primary") @default(uuid())
+  name String @unique @db.VarChar()
+  // email String @unique @db.VarChar(255)
+  // Post    Post[]
+  // Profile Profile?
+
+  @@index([name])
 }
