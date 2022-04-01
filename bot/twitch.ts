@@ -22,8 +22,10 @@ export default function twitch(io: Server) {
   client.on("message", async (channel, tags, message, self) => {
     if (self) return
 
+    const name = tags.username!.toLowerCase()
+
     if (message.toLowerCase() === "!hello") {
-      client.say(channel, `@${tags.username}, heya!`)
+      client.say(channel, `@${name}, heya!`)
     }
 
     if (message.toLowerCase().startsWith("!say")) {
@@ -34,7 +36,7 @@ export default function twitch(io: Server) {
 
         io.sockets.emit("message", {
           message: msg,
-          username: tags.username,
+          username: name,
           language: lang,
           slow: !!slow,
         })
@@ -42,28 +44,22 @@ export default function twitch(io: Server) {
     }
 
     if (message === "!register") {
-      const name = tags.username!.toLowerCase()
-
       await upsertUser(name)
 
-      client.say(channel, `@${tags.username} registered`)
+      client.say(channel, `@${name} registered`)
     }
 
     if (message === "!coin") {
-      const name = tags.username!.toLowerCase()
-
       await upsertUser(name)
 
       const user = await prisma.user.findUnique({ where: { name } })
 
       if (user) {
-        client.say(channel, `@${tags.username} has ${user.coin} $OULONG`)
+        client.say(channel, `@${name} has ${user.coin} $OULONG`)
       }
     }
 
     if (message === "!airdrop") {
-      const name = tags.username!.toLowerCase()
-
       if (name !== "narzelive") {
         return
       }
@@ -74,8 +70,6 @@ export default function twitch(io: Server) {
       )
 
       const viewers = chattersResponse.data.chatters.viewers
-
-      console.log({ viewers })
 
       // Upsert user
       await prisma.user.createMany({
@@ -96,7 +90,7 @@ export default function twitch(io: Server) {
 
       client.say(
         channel,
-        `@${tags.username} gives $OULONG to ${viewers.length} viewers!`
+        `@${name} gives $OULONG to ${viewers.length} viewers!`
       )
     }
   })
