@@ -11,7 +11,8 @@
   "scripts": {
     "start": "ts-node .",
     "dev": "ts-node-dev .",
-    "deploy-commands": "ts-node deploy-commands"
+    "deploy-commands": "ts-node deploy-commands",
+    "prisma": "dotenv-flow -- prisma"
   },
   "dependencies": {
     "@discordjs/builders": "^0.12.0",
@@ -29,6 +30,7 @@
   "devDependencies": {
     "@types/dotenv-flow": "^3.2.0",
     "@types/tmi.js": "^1.8.1",
+    "dotenv-flow-cli": "^1.0.0",
     "eslint": "^8.11.0",
     "prisma": "^3.11.1"
   }
