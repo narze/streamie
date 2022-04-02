@@ -19,7 +19,7 @@ export interface ErrorResult {
   error: string
 }
 
-async function gacha(
+export async function gacha(
   name: string,
   bet: number = 1
 ): Promise<GachaResult | ErrorResult> {
@@ -70,5 +70,3 @@ async function gacha(
 
   return { data: result } as GachaResult
 }
-
-export default gacha
