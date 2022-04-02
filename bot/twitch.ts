@@ -5,6 +5,10 @@ import axios from "axios"
 import gacha from "./gacha"
 import { isError } from "./gacha"
 
+interface ITwitchCommand {
+  execute: (channel: string, tags: tmi.ChatUserstate, message: string) => void
+}
+
 export default function twitch(io: Server) {
   const client = new tmi.Client({
     options: { debug: true, messagesLogLevel: "info" },
@@ -21,37 +25,29 @@ export default function twitch(io: Server) {
 
   client.connect().catch(console.error)
 
-  client.on("message", async (channel, tags, message, self) => {
-    if (self) return
+  const commands = new Map<string, ITwitchCommand>()
 
-    const name = tags.username!.toLowerCase()
-
-    if (message.toLowerCase() === "!hello") {
+  commands.set("!hello", {
+    execute: (channel, tags, _message) => {
+      const name = tags.username!.toLowerCase()
       client.say(channel, `@${name}, heya!`)
-    }
+    },
+  })
 
-    if (message.toLowerCase().startsWith("!say")) {
-      const matches = message.match(/^!say(!(\w+))?(!slow)?\s(.+)$/)
+  commands.set("!register", {
+    execute: async (channel, tags, _message) => {
+      const name = tags.username!.toLowerCase()
 
-      if (matches) {
-        const [_0, _1, lang, slow, msg] = matches
-
-        io.sockets.emit("message", {
-          message: msg,
-          username: name,
-          language: lang,
-          slow: !!slow,
-        })
-      }
-    }
-
-    if (message === "!register") {
       await upsertUser(name)
 
       client.say(channel, `@${name} registered`)
-    }
+    },
+  })
 
-    if (message === "!coin") {
+  commands.set("!coin", {
+    execute: async (channel, tags, _message) => {
+      const name = tags.username!.toLowerCase()
+
       await upsertUser(name)
 
       const user = await prisma.user.findUnique({ where: { name } })
@@ -59,9 +55,12 @@ export default function twitch(io: Server) {
       if (user) {
         client.say(channel, `@${name} has ${user.coin} $OULONG`)
       }
-    }
+    },
+  })
 
-    if (message === "!airdrop") {
+  commands.set("!airdrop", {
+    execute: async (channel, tags, _message) => {
+      const name = tags.username!.toLowerCase()
       if (name !== "narzelive") {
         return
       }
@@ -94,9 +93,12 @@ export default function twitch(io: Server) {
         channel,
         `@${name} gives $OULONG to ${viewers.length} viewers!`
       )
-    }
+    },
+  })
 
-    if (message.startsWith("!gacha")) {
+  commands.set("!gacha", {
+    execute: async (channel, tags, message) => {
+      const name = tags.username!.toLowerCase()
       const [_, ...cmdArgs] = message.split(/\s+/)
 
       let amount = 1
@@ -123,7 +125,42 @@ export default function twitch(io: Server) {
           )
         }
       }
+    },
+  })
+
+  commands.set("!say", {
+    execute: async (_channel, tags, message) => {
+      const name = tags.username!.toLowerCase()
+      const matches = message.match(/^!say(!(\w+))?(!slow)?\s(.+)$/)
+
+      if (matches) {
+        const [_0, _1, lang, slow, msg] = matches
+
+        io.sockets.emit("message", {
+          message: msg,
+          username: name,
+          language: lang,
+          slow: !!slow,
+        })
+      }
+    },
+  })
+
+  client.on("message", async (channel, tags, message, self) => {
+    if (self) return
+
+    const commandStr = message
+      .toLowerCase()
+      .split(" ")[0]
+      .replace(/(!\w+)(!\w+)*/, "$1")
+
+    const command = commands.get(commandStr)
+
+    if (!command) {
+      return
     }
+
+    command.execute(channel, tags, message)
   })
 }
 
