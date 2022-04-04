@@ -19,6 +19,9 @@ EXPOSE 3000
 # For remote debugging, add this port to devspace.yaml: dev.ports[*].forward[*].port: 9229
 EXPOSE 9229
 
+# Socket.io
+EXPOSE 8080
+
 # Container start command (DO NOT CHANGE and see note below)
 CMD ["yarn", "start"]
 
