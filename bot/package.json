@@ -18,6 +18,7 @@
     "@discordjs/builders": "^0.12.0",
     "@discordjs/rest": "^0.3.0",
     "@prisma/client": "^3.11.1",
+    "axios": "^0.26.1",
     "discord-api-types": "^0.29.0",
     "discord.js": "^13.6.0",
     "dotenv-flow": "^3.2.0",
@@ -30,7 +31,6 @@
   "devDependencies": {
     "@types/dotenv-flow": "^3.2.0",
     "@types/tmi.js": "^1.8.1",
-    "axios": "^0.26.1",
     "dotenv-flow-cli": "^1.0.0",
     "eslint": "^8.11.0",
     "prisma": "^3.11.1"
