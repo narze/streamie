@@ -1,6 +1,8 @@
-FROM node:16-alpine
+FROM node:16-slim
 
-# Set working directory
+RUN apt-get update
+RUN apt-get install -y openssl
+
 WORKDIR /app
 
 ENV NODE_ENV production
@@ -24,6 +26,8 @@ EXPOSE 9229
 
 # Socket.io
 EXPOSE 8080
+
+RUN npx -w bot prisma generate
 
 # Container start command (DO NOT CHANGE and see note below)
 CMD ["yarn", "start"]

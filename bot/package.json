@@ -23,6 +23,7 @@
     "discord.js": "^13.6.0",
     "dotenv-flow": "^3.2.0",
     "socket.io": "^4.4.1",
+    "prisma": "^3.11.1",
     "tmi.js": "^1.8.5",
     "ts-node": "^10.7.0",
     "ts-node-dev": "^1.1.8",
@@ -32,7 +33,6 @@
     "@types/dotenv-flow": "^3.2.0",
     "@types/tmi.js": "^1.8.1",
     "dotenv-flow-cli": "^1.0.0",
-    "eslint": "^8.11.0",
-    "prisma": "^3.11.1"
+    "eslint": "^8.11.0"
   }
 }
