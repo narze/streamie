@@ -12,6 +12,9 @@ RUN yarn
 # Add source code files to WORKDIR
 COPY . .
 
+# Install dependencies from sub-packages
+RUN yarn
+
 # Application port (optional)
 EXPOSE 3000
 
