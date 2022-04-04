@@ -8,7 +8,7 @@ export default function socket() {
     },
   })
 
-  console.log("started socket server at port 8000")
+  console.log("started socket server at port 8080")
 
   return io
 }
