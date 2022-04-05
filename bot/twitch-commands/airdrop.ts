@@ -4,7 +4,7 @@ import axios from "axios"
 
 const airdrop: ITwitchCommand = {
   name: "!airdrop",
-  execute: async (client, channel, tags, _message) => {
+  execute: async (client, channel, tags, _message, misc) => {
     const name = tags.username!.toLowerCase()
     if (name !== "narzelive") {
       return
@@ -35,6 +35,10 @@ const airdrop: ITwitchCommand = {
     })
 
     client.say(channel, `@${name} gives $OULONG to ${viewers.length} viewers!`)
+
+    misc?.io?.sockets.emit("airdrop", {
+      viewerCount: viewers.length,
+    })
   },
 }
 
