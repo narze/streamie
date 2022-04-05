@@ -27,7 +27,7 @@
   }
 </script>
 
-<main class="p-4">
+<main class="p-2 text-right">
   {#each Object.entries(messages) as [key, msg] (key)}
     <div in:fly={{ y: 200 }} out:fly={{ y: -200 }} animate:flip={{ duration: 200 }}>{msg}</div>
   {/each}
@@ -35,8 +35,10 @@
 
 <style>
   main {
-    /* background-color: #0f0; */
+    background-color: magenta;
     height: 100vh;
     width: 100%;
+    font-size: 400%;
+    color: white;
   }
 </style>
