@@ -7,6 +7,15 @@
   let messages = {}
   let msgIdx = 0
 
+  interface GachaResult {
+    data: {
+      state: "win" | "lose"
+      bet: number
+      win: number
+      balance: number
+    }
+  }
+
   onMount(() => {
     const socket = io("ws://localhost:8080")
 
@@ -14,6 +23,17 @@
       msgIdx += 1
 
       addTempMessage(msgIdx, `🎁 (${viewerCount})`)
+    })
+
+    socket.on("gacha", ({ data, name }: { data: GachaResult["data"]; name: string }) => {
+      console.log({ data, name })
+      msgIdx += 1
+
+      if (data.state === "win") {
+        addTempMessage(msgIdx, `@${name} +${data.win} $OULONG 🤑 (${data.balance})`)
+      } else {
+        addTempMessage(msgIdx, `@${name} -${data.bet} $OULONG 💸 (${data.balance})`)
+      }
     })
   })
 
@@ -27,9 +47,16 @@
   }
 </script>
 
-<main class="p-2 text-right">
+<main class="p-2 text-right flex flex-col gap-2 items-end">
   {#each Object.entries(messages) as [key, msg] (key)}
-    <div in:fly={{ y: 200 }} out:fly={{ y: -200 }} animate:flip={{ duration: 200 }}>{msg}</div>
+    <span
+      class="feed-item py-1 px-4 rounded w-fit"
+      in:fly={{ y: 200 }}
+      out:fly={{ y: -200 }}
+      animate:flip={{ duration: 200 }}
+    >
+      {msg}
+    </span>
   {/each}
 </main>
 
@@ -38,7 +65,12 @@
     background-color: magenta;
     height: 100vh;
     width: 100%;
-    font-size: 400%;
+    font-size: 200%;
+    font-weight: bold;
     color: white;
+  }
+
+  .feed-item {
+    background-color: rgba(0, 0, 0);
   }
 </style>

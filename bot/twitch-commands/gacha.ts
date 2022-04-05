@@ -3,7 +3,7 @@ import { isError, gacha as gachaFn } from "../gacha"
 
 const gacha: ITwitchCommand = {
   name: "!gacha",
-  execute: async (client, channel, tags, message) => {
+  execute: async (client, channel, tags, message, misc) => {
     const name = tags.username!.toLowerCase()
     const [_, ...cmdArgs] = message.split(/\s+/)
 
@@ -30,6 +30,11 @@ const gacha: ITwitchCommand = {
           `@${name} ลงทุน ${gachaResult.data.bet} $OULONG -> แตก! (${gachaResult.data.balance}).`
         )
       }
+
+      misc?.io?.sockets.emit("gacha", {
+        data: gachaResult.data,
+        name: name,
+      })
     }
   },
 }
