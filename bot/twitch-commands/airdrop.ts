@@ -4,10 +4,21 @@ import axios from "axios"
 
 const airdrop: ITwitchCommand = {
   name: "!airdrop",
-  execute: async (client, channel, tags, _message, misc) => {
+  execute: async (client, channel, tags, message, misc) => {
     const name = tags.username!.toLowerCase()
     if (name !== "narzelive") {
       return
+    }
+
+    const [_, ...cmdArgs] = message.split(/\s+/)
+
+    let amount = 1
+
+    if (cmdArgs.length) {
+      let group = cmdArgs[0].match(/(-?\d+)/)
+      if (group && group[1]) {
+        amount = Number.parseInt(group[1])
+      }
     }
 
     const chattersResponse = await axios.get(
@@ -26,7 +37,7 @@ const airdrop: ITwitchCommand = {
     await prisma.user.updateMany({
       data: {
         coin: {
-          increment: 1,
+          increment: amount,
         },
       },
       where: {
@@ -34,9 +45,13 @@ const airdrop: ITwitchCommand = {
       },
     })
 
-    client.say(channel, `@${name} gives $OULONG to ${viewers.length} viewers!`)
+    client.say(
+      channel,
+      `@${name} gives ${amount} $OULONG to ${viewers.length} viewers!`
+    )
 
     misc?.io?.sockets.emit("airdrop", {
+      amount,
       viewerCount: viewers.length,
     })
   },
