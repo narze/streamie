@@ -5,6 +5,7 @@
   import { onMount } from "svelte"
 
   let messages = []
+  let audioQueue: Array<HTMLAudioElement> = []
   let autoread = false
   let clicked = false
 
@@ -15,19 +16,47 @@
       messages = [...messages, `${username}: ${message} (${language ?? "th"})`]
 
       if (autoread) {
-        read(message, language, slow)
+        addToReadQueue(message, language, slow)
       }
     })
+
+    setInterval(() => {
+      playAudioQueue()
+    }, 5000)
   })
 
-  function read(message: string, language: string = "th", slow: boolean = false) {
+  $: if (audioQueue.length > 0) {
+    playAudioQueue()
+  }
+
+  function playAudioQueue() {
+    const audio = audioQueue[0]
+
+    if (audio && audio.paused) {
+      audio.addEventListener("ended", (e) => {
+        audioQueue = audioQueue.slice(1)
+      })
+
+      const playPromise = audio.play()
+
+      if (playPromise !== undefined) {
+        playPromise.catch(function (error) {
+          audioQueue = audioQueue.slice(1)
+        })
+      }
+    }
+  }
+
+  function addToReadQueue(message: string, language: string = "th", slow: boolean = false) {
     if (!canRead) {
       return
     }
 
-    new Audio(
+    const audio = new Audio(
       `https://tts-api.vercel.app/api/tts?text=${message}&lang=${language}&slow=${slow ? "1" : ""}`
-    ).play()
+    )
+
+    audioQueue = [...audioQueue, audio]
   }
 
   function canRead(message: string): boolean {
@@ -55,7 +84,7 @@
   {#each messages as message}
     <p>
       {message}
-      <button on:click={() => read(message)}>🔉</button>
+      <!-- <button on:click={() => read(message)}>🔉</button> -->
     </p>
   {/each}
   <!-- </Middle> -->
