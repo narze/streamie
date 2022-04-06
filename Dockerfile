@@ -29,6 +29,9 @@ EXPOSE 8080
 
 RUN npx -w bot prisma generate
 
+# Build web
+RUN yarn web build
+
 # Container start command (DO NOT CHANGE and see note below)
 CMD ["yarn", "start"]
 
