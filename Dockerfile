@@ -1,11 +1,9 @@
-FROM node:16-slim
+FROM node:16-slim as build
 
 RUN apt-get update
 RUN apt-get install -y openssl
 
 WORKDIR /app
-
-ENV NODE_ENV production
 
 # Add package.json to WORKDIR and install dependencies
 COPY package.json yarn.lock ./
@@ -16,6 +14,24 @@ COPY . .
 
 # Install dependencies from sub-packages
 RUN yarn
+
+# Build web
+RUN yarn web build
+
+FROM node:16-slim as app
+
+ENV NODE_ENV production
+
+RUN apt-get update
+RUN apt-get install -y openssl
+
+WORKDIR /app
+
+# Add package.json to WORKDIR and install dependencies
+COPY package.json yarn.lock ./
+RUN yarn
+
+COPY . .
 
 # Application port (optional)
 EXPOSE 3000
@@ -29,8 +45,9 @@ EXPOSE 8080
 
 RUN npx -w bot prisma generate
 
-# Build web
-RUN yarn web build
+RUN mkdir -p web/build
+
+COPY --from=build /app/web/build web/build
 
 # Container start command (DO NOT CHANGE and see note below)
 CMD ["yarn", "start"]
