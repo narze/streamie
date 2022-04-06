@@ -61,8 +61,12 @@
 </main>
 
 <style>
+  :global(html, body) {
+    background-color: rgba(0, 0, 0, 0) !important;
+  }
+
   main {
-    background-color: magenta;
+    background-color: rgba(0, 0, 0, 0);
     height: 100vh;
     width: 100%;
     font-size: 200%;
@@ -71,6 +75,6 @@
   }
 
   .feed-item {
-    background-color: rgba(0, 0, 0);
+    background-color: rgba(0, 0, 0, 0.5);
   }
 </style>
