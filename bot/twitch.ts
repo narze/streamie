@@ -45,6 +45,12 @@ export default function twitch(io: Server) {
 
     // if "narzebotdev" is offline, unpause automatically
     if (!moderators.includes("narzebotdev")) {
+      // TODO: Find better way to periodially inform prod bot to pause
+      if (process.env.NODE_ENV !== "production") {
+        await client.say("narzelive", `!pause`)
+        return
+      }
+
       isPaused = false
       client.say("narzelive", `isPaused: ${isPaused}`)
     }
