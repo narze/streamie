@@ -2,6 +2,11 @@ import tmi from "tmi.js"
 import { Server } from "socket.io"
 import { ITwitchCommand } from "./types"
 import fs from "node:fs"
+import axios from "axios"
+
+let isPaused = false
+
+let interval
 
 export default function twitch(io: Server) {
   const client = new tmi.Client({
@@ -30,8 +35,56 @@ export default function twitch(io: Server) {
     commands.set(command.name!, command)
   }
 
+  interval = setInterval(async () => {
+    const chattersResponse = await axios.get(
+      "https://tmi.twitch.tv/group/user/narzelive/chatters",
+      { responseType: "json" }
+    )
+
+    const moderators = chattersResponse.data.chatters.moderators
+
+    // if "narzebotdev" is offline, unpause automatically
+    if (!moderators.includes("narzebotdev")) {
+      isPaused = false
+      client.say("narzelive", `isPaused: ${isPaused}`)
+    }
+  }, 60000)
+
+  client.on("join", (channel, _name, self) => {
+    if (!self) {
+      return
+    }
+
+    // Dev mode - send message to @narzebot to pause receiving commands
+    if (process.env.NODE_ENV !== "production") {
+      client.say(channel, "!pause")
+    }
+  })
+
   client.on("message", async (channel, tags, message, self) => {
     if (self) return
+
+    // Production bot pause
+    // TODO: refactor to twitch-commands/pause
+    if (
+      ["narzelive", "narzebotdev"].includes(tags.username!.toLowerCase()) &&
+      message.includes("!pause") &&
+      process.env.NODE_ENV === "production"
+    ) {
+      isPaused = true
+      client.say(channel, `isPaused: ${isPaused}`)
+      return
+    }
+
+    if (
+      ["narzelive", "narzebotdev"].includes(tags.username!.toLowerCase()) &&
+      message.includes("!unpause") &&
+      process.env.NODE_ENV === "production"
+    ) {
+      isPaused = false
+      client.say(channel, `isPaused: ${isPaused}`)
+      return
+    }
 
     const commandStr = message
       .toLowerCase()
@@ -44,6 +97,28 @@ export default function twitch(io: Server) {
       return
     }
 
+    // Production bot skip !commands if paused
+    if (isPaused && process.env.NODE_ENV === "production") {
+      return
+    }
+
     await command.execute(client, channel, tags, message, { io })
+  })
+
+  async function disconnect() {
+    await client.say("narzeLIVE", "!unpause")
+
+    console.log("disconnect", await client.disconnect())
+
+    clearInterval(interval)
+
+    process.exit(0)
+  }
+
+  process.on("SIGINT", () => disconnect())
+  process.on("SIGTERM", () => disconnect())
+  process.on("uncaughtException", (err) => {
+    console.error(err)
+    disconnect()
   })
 }
