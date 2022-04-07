@@ -35,6 +35,12 @@
         addTempMessage(msgIdx, `@${name} -${data.bet} $OULONG 💸 (${data.balance})`)
       }
     })
+
+    socket.on("text", ({ text }) => {
+      msgIdx += 1
+
+      addTempMessage(msgIdx, `${text}`)
+    })
   })
 
   function addTempMessage(key, text) {
