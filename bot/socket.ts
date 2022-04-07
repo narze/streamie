@@ -1,7 +1,7 @@
 import { Server } from "socket.io"
 
 export default function socket() {
-  const io = new Server(8080, {
+  const io = new Server(+(process.env.SOCKET_IO_PORT || 8080), {
     cors: {
       origin: "*",
       methods: ["GET", "POST"],
