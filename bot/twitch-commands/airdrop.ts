@@ -26,7 +26,11 @@ const airdrop: ITwitchCommand = {
       { responseType: "json" }
     )
 
+    const moderators = chattersResponse.data.chatters.moderators
+    const staff = chattersResponse.data.chatters.staff
     const viewers = chattersResponse.data.chatters.viewers
+    const vips = chattersResponse.data.chatters.vips
+    const allViewers = [...moderators, ...staff, ...viewers, ...vips]
 
     // Upsert user
     await prisma.user.createMany({
@@ -41,18 +45,18 @@ const airdrop: ITwitchCommand = {
         },
       },
       where: {
-        name: { in: viewers },
+        name: { in: allViewers },
       },
     })
 
     client.say(
       channel,
-      `@${name} gives ${amount} $OULONG to ${viewers.length} viewers!`
+      `@${name} gives ${amount} $OULONG to ${allViewers.length} viewers!`
     )
 
     misc?.io?.sockets.emit("airdrop", {
       amount,
-      viewerCount: viewers.length,
+      viewerCount: allViewers.length,
     })
   },
 }
