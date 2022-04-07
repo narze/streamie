@@ -51,8 +51,10 @@ export default function twitch(io: Server) {
         return
       }
 
-      isPaused = false
-      client.say("narzelive", `isPaused: ${isPaused}`)
+      if (isPaused) {
+        isPaused = false
+        client.say("narzelive", `isPaused: ${isPaused}`)
+      }
     }
   }, 60000)
 
