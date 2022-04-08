@@ -1,5 +1,6 @@
 import { ITwitchCommand } from "../types"
 import { isError, gacha as gachaFn } from "../invest"
+import prisma from "../prisma"
 
 const gacha: ITwitchCommand = {
   name: "!gacha",
@@ -18,7 +19,14 @@ const gacha: ITwitchCommand = {
 
     const gachaResult = await gachaFn(name, amount)
 
-    if (!isError(gachaResult)) {
+    if (isError(gachaResult)) {
+      const user = await prisma.user.findUnique({ where: { name } })
+
+      await client.say(
+        channel,
+        `@${name} มี $OULONG ไม่พอ! (มีอยู่ ${user!.coin} $OULONG).`
+      )
+    } else {
       if (gachaResult.data.state == "win") {
         await client.say(
           channel,
