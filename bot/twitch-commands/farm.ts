@@ -1,13 +1,32 @@
 import { ITwitchCommand } from "../types"
 import { upsertUser } from "../upsertUser"
 import prisma from "../prisma"
+import axios from "axios"
 
 const farm: ITwitchCommand = {
   name: "!farm",
   execute: async (client, channel, tags, _message, _misc) => {
     const name = tags.username!.toLowerCase()
 
-    const farmAmount = 5
+    // Get streams
+    const twitchToken = process.env.TWITCH_HELIX_OAUTH_TOKEN!
+    const twitchClientId = process.env.TWITCH_HELIX_CLIENT_ID!
+
+    const streamsRes = await axios.get(
+      "https://api.twitch.tv/helix/streams?user_login=narzelive",
+      {
+        headers: {
+          Authorization: `Bearer ${twitchToken}`,
+          "Client-Id": twitchClientId,
+        },
+      }
+    )
+
+    let farmAmount = 1
+
+    if (streamsRes?.data?.data[0]?.type === "live") {
+      farmAmount = 5 + Math.ceil(Math.random() * 5)
+    }
 
     const user = await upsertUser(name)
 
