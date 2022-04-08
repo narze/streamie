@@ -1,8 +1,8 @@
 import { ITwitchCommand } from "../types"
 import { isError, gacha as gachaFn } from "../invest"
 
-const gacha: ITwitchCommand = {
-  name: "!gacha",
+const invest: ITwitchCommand = {
+  name: "!invest",
   execute: async (client, channel, tags, message, misc) => {
     const name = tags.username!.toLowerCase()
     const [_, ...cmdArgs] = message.split(/\s+/)
@@ -41,4 +41,4 @@ const gacha: ITwitchCommand = {
   },
 }
 
-export default gacha
+export default invest

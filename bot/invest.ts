@@ -48,20 +48,12 @@ export async function gacha(
 
   coin -= bet
 
-  const dice = Math.random()
+  const investReturn = invest(bet)
+  coin += investReturn
 
-  if (dice < 0.49) {
-    // Win
-    const winAmount = Math.round(bet * 2)
-    coin += winAmount
-
-    result.win = winAmount
-    result.state = "win"
-    result.balance = coin
-  } else {
-    // Lose
-    result.balance = coin
-  }
+  result.win = investReturn
+  result.state = "win"
+  result.balance = coin
 
   await prisma.user.update({
     where: { name },
@@ -69,4 +61,45 @@ export async function gacha(
   })
 
   return { data: result } as GachaResult
+}
+
+function invest(investAmount: number): number {
+  // Investing formula
+  // 30% to return 0-0.5x
+  // 28% to return 0.5-1x
+  // 40% to return 1x-2x
+  // 2% to return 2-5x (jackpot)
+  // [probMin, probMax], [returnMin, returnMax]
+  const ranges = [
+    [
+      [0, 0.3],
+      [0, 0.5],
+    ],
+    [
+      [0.3, 0.58],
+      [0.5, 1],
+    ],
+    [
+      [0.58, 0.98],
+      [1, 2.0],
+    ],
+    [
+      [0.98, 1],
+      [2.0, 5.0],
+    ],
+  ]
+
+  const probIn = Math.random()
+  const [[pmin, pmax], [rmin, rmax]] = ranges.find(
+    ([[pmin, pmax]]) => probIn >= pmin && probIn < pmax
+  )!
+  const investReturn = Math.round(
+    investAmount * (((probIn - pmin) / (pmax - pmin)) * (rmax - rmin) + rmin)
+  )
+
+  if (investReturn == investAmount) {
+    return investReturn + (probIn > 0.58 ? 1 : -1)
+  }
+
+  return investReturn
 }
