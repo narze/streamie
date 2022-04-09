@@ -36,7 +36,7 @@ const allin: ITwitchCommand = {
         )
       }
 
-      misc?.io?.sockets.emit("gacha", {
+      misc?.io?.emit("gacha", {
         data: gachaResult.data,
         name: name,
       })

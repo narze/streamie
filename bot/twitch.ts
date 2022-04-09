@@ -1,14 +1,16 @@
 import tmi from "tmi.js"
-import { Server } from "socket.io"
 import { ITwitchCommand } from "./types"
 import fs from "node:fs"
 import axios from "axios"
+import socket from "./socket-client"
+
+const io = socket()
 
 let isPaused = false
 
 let interval
 
-export default function twitch(io: Server) {
+export default function twitch() {
   const client = new tmi.Client({
     options: { debug: true, messagesLogLevel: "info" },
     connection: {

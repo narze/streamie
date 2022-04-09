@@ -1,0 +1,15 @@
+{
+  "name": "socket-server",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Manassarn Manoonchai",
+  "license": "MIT",
+  "scripts": {
+    "start": "node .",
+    "client": "node client.js"
+  },
+  "dependencies": {
+    "socket.io": "^4.4.1",
+    "socket.io-client": "^4.4.1"
+  }
+}

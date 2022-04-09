@@ -9,7 +9,7 @@ const say: ITwitchCommand = {
     if (matches) {
       const [_0, _1, lang, slow, msg] = matches
 
-      misc?.io?.sockets.emit("message", {
+      misc?.io?.emit("say", {
         message: msg,
         username: name,
         language: lang,

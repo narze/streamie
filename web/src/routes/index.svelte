@@ -12,7 +12,7 @@
   onMount(() => {
     const socket = io("ws://streamie.narze.live")
 
-    socket.on("message", ({ message, username, language, slow }) => {
+    socket.on("say", ({ message, username, language, slow }) => {
       messages = [...messages, `${username}: ${message} (${language ?? "th"})`]
 
       if (autoread) {

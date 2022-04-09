@@ -54,7 +54,7 @@ const airdrop: ITwitchCommand = {
       `@${name} gives ${amount} $OULONG to ${allViewers.length} viewers!`
     )
 
-    misc?.io?.sockets.emit("airdrop", {
+    misc?.io?.emit("airdrop", {
       amount,
       viewerCount: allViewers.length,
     })

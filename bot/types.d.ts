@@ -1,5 +1,5 @@
 import tmi from "tmi.js"
-import { Server } from "socket.io"
+import { Socket } from "socket.io-client"
 
 export interface ITwitchCommand {
   name: string
@@ -9,7 +9,7 @@ export interface ITwitchCommand {
     tags: tmi.ChatUserstate,
     message: string,
     misc?: {
-      io?: Server
+      io?: Socket
     }
   ) => void
 }

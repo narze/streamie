@@ -70,7 +70,7 @@ const give: ITwitchCommand = {
       } $OULONG)`
     )
 
-    misc?.io?.sockets.emit("text", {
+    misc?.io?.emit("text", {
       text: `${name} -> ${amount} $OULONG -> ${recipientName}`,
     })
   },
