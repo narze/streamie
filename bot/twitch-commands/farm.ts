@@ -5,7 +5,7 @@ import axios from "axios"
 
 const farm: ITwitchCommand = {
   name: "!farm",
-  execute: async (client, channel, tags, _message, _misc) => {
+  execute: async (client, channel, tags, _message, misc) => {
     const name = tags.username!.toLowerCase()
 
     // Get streams
@@ -64,6 +64,10 @@ const farm: ITwitchCommand = {
     })
 
     await client.say(channel, `@${name} ฟาร์มได้ ${farmAmount} $OULONG`)
+
+    misc?.io?.emit("text", {
+      text: `🍄 ${name} !farm -> ${farmAmount} $OULONG`,
+    })
   },
 }
 
