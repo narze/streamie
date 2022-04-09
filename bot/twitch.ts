@@ -96,6 +96,43 @@ export default function twitch() {
       return
     }
 
+    const isCommaCommand = message.startsWith(",")
+    const isBangCommand = message.startsWith("!")
+
+    if (isCommaCommand || isBangCommand) {
+      const commandStr = message.replace(/^[,!](\s*)(\w+)$/, "$2")
+
+      console.log({ commandStr })
+
+      if (commandStr) {
+        switch (commandStr) {
+          case "w":
+            io.emit("play", { key: "up" })
+            break
+          case "a":
+            io.emit("play", { key: "left" })
+            break
+          case "s":
+            io.emit("play", { key: "down" })
+            break
+          case "d":
+            io.emit("play", { key: "right" })
+            break
+          case "z":
+            io.emit("play", { key: "z" })
+            break
+          case "x":
+            io.emit("play", { key: "x" })
+            break
+          case "r":
+            io.emit("play", { key: "r" })
+            break
+          default:
+            break
+        }
+      }
+    }
+
     const commandStr = message
       .toLowerCase()
       .split(" ")[0]
