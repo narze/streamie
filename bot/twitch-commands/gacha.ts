@@ -2,6 +2,7 @@ import { ITwitchCommand } from "../types"
 import { isError, gacha as gachaFn } from "../invest"
 import prisma from "../prisma"
 
+// Deprecated: Use !invest instead
 const gacha: ITwitchCommand = {
   name: "!gacha",
   execute: async (client, channel, tags, message, misc) => {
