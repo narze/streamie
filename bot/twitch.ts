@@ -163,7 +163,8 @@ export default function twitch() {
 
     // await client.say("narzeLIVE", "!unpause")
 
-    console.log("disconnect", await client.disconnect())
+    console.log("disconnect twitch client", await client.disconnect())
+    console.log("disconnect redis client", await redisClient.disconnect())
 
     clearInterval(interval)
 
