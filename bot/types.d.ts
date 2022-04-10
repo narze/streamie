@@ -2,7 +2,7 @@ import tmi from "tmi.js"
 import { Socket } from "socket.io-client"
 
 export interface ITwitchCommand {
-  name: string
+  name: string | string[]
   execute: (
     client: tmi.Client,
     channel: string,

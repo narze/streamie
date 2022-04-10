@@ -40,7 +40,14 @@ export default function twitch() {
 
   for (const file of commandFiles) {
     const command: ITwitchCommand = require(`./twitch-commands/${file}`).default
-    commands.set(command.name!, command)
+
+    if (Array.isArray(command.name)) {
+      for (const name of command.name) {
+        commands.set(name, command)
+      }
+    } else {
+      commands.set(command.name!, command)
+    }
   }
 
   // interval = setInterval(async () => {
