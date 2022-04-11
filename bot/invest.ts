@@ -65,22 +65,17 @@ export async function gacha(
 
 function invest(investAmount: number): number {
   // Investing formula
-  // 30% to return 0-0.5x
-  // 28% to return 0.5-1x
-  // 40% to return 1x-2x
+  // 55% to return 0-1x
+  // 43% to return 1x-2x
   // 2% to return 2-5x (jackpot)
   // [probMin, probMax], [returnMin, returnMax]
   const ranges = [
     [
-      [0, 0.3],
-      [0, 0.5],
+      [0, 0.55],
+      [0, 1],
     ],
     [
-      [0.3, 0.58],
-      [0.5, 1],
-    ],
-    [
-      [0.58, 0.98],
+      [0.55, 0.98],
       [1, 2.0],
     ],
     [
