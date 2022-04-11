@@ -4,7 +4,7 @@ import prisma from "../prisma"
 import axios from "axios"
 
 const farm: ITwitchCommand = {
-  name: "!farm",
+  name: ["!farm", "!f"],
   execute: async (client, channel, tags, _message, misc) => {
     const name = tags.username!.toLowerCase()
 
