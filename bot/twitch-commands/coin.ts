@@ -3,7 +3,7 @@ import prisma from "../prisma"
 import { upsertUser } from "../upsertUser"
 
 const coin: ITwitchCommand = {
-  name: "!coin",
+  name: ["!coin", "!c"],
   execute: async (client, channel, tags, _message) => {
     const name = tags.username!.toLowerCase()
 

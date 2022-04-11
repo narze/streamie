@@ -36,6 +36,7 @@
     "@types/tmi.js": "^1.8.1",
     "dotenv-flow-cli": "^1.0.0",
     "eslint": "^8.11.0",
-    "vitest": "^0.9.3"
+    "vitest": "^0.9.3",
+    "vitest-mock-extended": "^0.1.3"
   }
 }
