@@ -115,7 +115,10 @@ export default function twitch() {
       }
     }
 
-    await command.execute(client, channel, tags, message, { io })
+    await command.execute(client, channel, tags, message, {
+      io,
+      redis: redisClient,
+    })
   })
 
   client.on("subscription", subActions(client))

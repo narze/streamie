@@ -1,6 +1,4 @@
 import { ITwitchCommand } from "../types"
-import prisma from "../prisma"
-import { upsertUser } from "../upsertUser"
 
 const place: ITwitchCommand = {
   name: ["!place", "!p"],
@@ -12,7 +10,9 @@ const place: ITwitchCommand = {
       return
     }
 
-    if (!c.match(/^(?:[0-9a-fA-F]{3}){1,2}$/)) {
+    if (c === "" || c === undefined) {
+      c = Math.floor(Math.random() * 16777215).toString(16)
+    } else if (!c.match(/^(?:[0-9a-fA-F]{3}){1,2}$/)) {
       return
     }
 
@@ -24,6 +24,8 @@ const place: ITwitchCommand = {
       y,
       c,
     })
+
+    await misc?.redis?.HSET(`place:row:${y}`, `${x}`, c)
   },
 }
 

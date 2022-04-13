@@ -1,14 +1,32 @@
 <script lang="ts">
-  const width = 32
-  const height = 32
+  import { io } from "socket.io-client"
+
+  import { onMount } from "svelte"
+
+  const width = 16
+  const height = 16
 
   const board: string[][] = Array(height)
     .fill(0)
-    .map(() => Array(width).fill(""))
+    .map(() => Array(width).fill("FFF"))
 
   function paint(x, y, colorHex) {
     board[y][x] = colorHex
   }
+
+  onMount(() => {
+    const socket = io("ws://streamie-socket.narze.live")
+
+    socket.on("place", ({ x, y, c }) => {
+      console.log({ x, y, c })
+      // return if array index overflow
+      if (x <= 0 || x > width || y <= 0 || y > height) {
+        console.log("overflow!")
+        return
+      }
+      paint(x - 1, y - 1, c)
+    })
+  })
 </script>
 
 <main>
