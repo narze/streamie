@@ -1,9 +1,10 @@
 <script context="module">
+  export const prerender = false
   const height = 16
   const width = 16
 
   export async function load({ params, fetch, session, stuff }) {
-    const url = `/api/place`
+    const url = `/api/place?rows=${height}`
     const response = await fetch(url)
 
     return {
