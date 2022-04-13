@@ -4,7 +4,7 @@ import { createClient } from "redis"
 
 import { ITwitchCommand } from "./types"
 import socket from "./socket-client"
-import { onBits } from "./twitch/actions"
+import { onBits, onSub } from "./twitch/actions"
 
 const io = socket()
 const redisClient = createClient({
@@ -69,25 +69,25 @@ export default function twitch() {
       if (commandStr) {
         switch (commandStr) {
           case "w":
-            io.emit("play", { key: "up" })
+            await io.emit("play", { key: "up" })
             break
           case "a":
-            io.emit("play", { key: "left" })
+            await io.emit("play", { key: "left" })
             break
           case "s":
-            io.emit("play", { key: "down" })
+            await io.emit("play", { key: "down" })
             break
           case "d":
-            io.emit("play", { key: "right" })
+            await io.emit("play", { key: "right" })
             break
           case "z":
-            io.emit("play", { key: "z" })
+            await io.emit("play", { key: "z" })
             break
           case "x":
-            io.emit("play", { key: "x" })
+            await io.emit("play", { key: "x" })
             break
           case "r":
-            io.emit("play", { key: "r" })
+            await io.emit("play", { key: "r" })
             break
           default:
             break
@@ -118,19 +118,8 @@ export default function twitch() {
     await command.execute(client, channel, tags, message, { io })
   })
 
-  // client.on(
-  //   "subscription",
-  //   async (_channel, username, _methods, _message, _userstate) => {
-  //     return await subscriptionPayout(username)
-  //   }
-  // )
-
-  // client.on(
-  //   "resub",
-  //   async (_channel, username, _months, _message, _userstate, _methods) => {
-  //     return await subscriptionPayout(username)
-  //   }
-  // )
+  client.on("subscription", subActions(client))
+  client.on("resub", subActions(client))
 
   // client.on(
   //   "subgift",
@@ -182,7 +171,7 @@ export default function twitch() {
 
     await client.say(channel, `@${name} รับ ${coin} $OULONG จาก ${bits} Bits`)
 
-    io.emit("text", {
+    await io.emit("text", {
       text: `🤗 ${name} ${bits} Bits -> ${coin} $OULONG`,
     })
   })
@@ -204,4 +193,23 @@ export default function twitch() {
     console.error(err)
     disconnect(1)
   })
+}
+
+function subActions(client) {
+  return async (channel, name, _methods, _message, _userstate) => {
+    const airdropCount = await onSub(name)
+
+    await client.say(
+      channel,
+      `@${name} รับ 100 $OULONG จากการ Subscribe และ Airdrop 5 $OULONG ให้ ${airdropCount} คน`
+    )
+
+    await io.emit("text", {
+      text: `😍 ${name} Subscribed`,
+    })
+
+    await io.emit("text", {
+      text: `✈️ Airdrop to ${airdropCount} people`,
+    })
+  }
 }
