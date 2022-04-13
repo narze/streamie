@@ -39,6 +39,7 @@
   },
   "type": "module",
   "dependencies": {
+    "redis": "^4.0.6",
     "socket.io-client": "^4.4.1"
   }
 }
