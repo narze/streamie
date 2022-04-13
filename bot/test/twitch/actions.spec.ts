@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest"
-import { onBits, onSub } from "../../twitch/actions"
+import { onBits, onGiftSub, onSub } from "../../twitch/actions"
 import { prismaMock } from "../prisma-mock"
 
 describe("onBits", () => {
@@ -72,5 +72,41 @@ describe("onSub", () => {
         coin: { increment: 5 },
       },
     })
+  })
+})
+
+describe("onGiftSub", () => {
+  vi.mock("axios", () => ({
+    __esModule: true,
+    default: {
+      get: vi.fn().mockResolvedValue({
+        data: {
+          chatter_count: 7,
+          chatters: {
+            broadcaster: ["narzelive"],
+            vips: ["bosssoq", "pandadhada"],
+            moderators: ["narzebot"],
+            staff: [],
+            admins: [],
+            global_mods: [],
+            viewers: ["foo", "bar", "baz"],
+          },
+        },
+      }),
+    },
+  }))
+
+  it("gives user 100 * number-of-subs coins", async () => {
+    const numberOfSubs = 5
+
+    const result = await onGiftSub("narzelive", numberOfSubs)
+
+    // Assert: expect narzelive to get 100 * n coins
+    expect(prismaMock.user.update).toBeCalledWith({
+      where: { name: "narzelive" },
+      data: { coin: { increment: 100 * numberOfSubs } },
+    })
+
+    expect(result).toEqual(100 * numberOfSubs)
   })
 })

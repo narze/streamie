@@ -4,7 +4,7 @@ import { createClient } from "redis"
 
 import { ITwitchCommand } from "./types"
 import socket from "./socket-client"
-import { onBits, onSub } from "./twitch/actions"
+import { onBits, onGiftSub, onSub } from "./twitch/actions"
 
 const io = socket()
 const redisClient = createClient({
@@ -121,47 +121,38 @@ export default function twitch() {
   client.on("subscription", subActions(client))
   client.on("resub", subActions(client))
 
-  // client.on(
-  //   "subgift",
-  //   async (
-  //     channel,
-  //     username,
-  //     _streakMonths,
-  //     recipient,
-  //     _methods,
-  //     _userstate
-  //   ) => {
-  //     await commands.giveCoin(username, 10)
-  //     await subscriptionPayout(recipient)
+  client.on(
+    "subgift",
+    async (channel, name, _streakMonths, recipient, _methods, _userstate) => {
+      const numberOfSubs = 1
+      const coinAmount = await onGiftSub(name, numberOfSubs)
 
-  //     await botSay(
-  //       client,
-  //       channel,
-  //       `${username} ได้รับ 10 $ARM จากการ Gift ให้ ${recipient} armKraab `
-  //     )
-  //   }
-  // )
+      await client.say(
+        channel,
+        `@${name} รับ ${coinAmount} $OULONG จากการ Gift Sub ให้ @${recipient}`
+      )
 
-  // client.on(
-  //   "submysterygift",
-  //   async (channel, username, numberOfSubs, _methods, _userstate) => {
-  //     await commands.giveCoin(username, 10 * numberOfSubs)
+      await io.emit("text", {
+        text: `😍 ${name} Gift sub to @${recipient}`,
+      })
+    }
+  )
 
-  //     await botSay(
-  //       client,
-  //       channel,
-  //       `${username} ได้รับ ${
-  //         10 * numberOfSubs
-  //       } $ARM จากการ Gift Sub ให้สมาชิก ${numberOfSubs} คน armKraab`
-  //     )
+  client.on(
+    "submysterygift",
+    async (channel, name, numberOfSubs, _methods, _userstate) => {
+      const coinAmount = await onGiftSub(name, numberOfSubs)
 
-  //     await widget.feed(
-  //       `<b class="badge bg-primary">${username}</b> ได้รับ <i class="fas fa-coins"></i> ${
-  //         10 * numberOfSubs
-  //       } $ARM จากการ Gift Sub x ${numberOfSubs}`
-  //     )
-  //   }
-  // )
+      await client.say(
+        channel,
+        `@${name} รับ ${coinAmount} $OULONG จากการ Gift Sub ให้ ${numberOfSubs} คน`
+      )
+
+      await io.emit("text", {
+        text: `😍😍😍 ${name} Gift subs to ${numberOfSubs} people`,
+      })
+    }
+  )
 
   client.on("cheer", async (channel, tags, _message) => {
     const bits = Number(tags.bits!)

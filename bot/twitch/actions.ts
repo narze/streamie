@@ -63,3 +63,15 @@ export async function onSub(username: string) {
 }
 
 // On Gifted Subs
+export async function onGiftSub(username: string, numberOfSubs: number) {
+  const coinAmount = numberOfSubs * 100
+
+  await upsertUser(username)
+
+  await prisma.user.update({
+    where: { name: username.toLowerCase() },
+    data: { coin: { increment: coinAmount } },
+  })
+
+  return coinAmount
+}
