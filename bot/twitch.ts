@@ -4,6 +4,7 @@ import { createClient } from "redis"
 
 import { ITwitchCommand } from "./types"
 import socket from "./socket-client"
+import { onBits } from "./twitch/actions"
 
 const io = socket()
 const redisClient = createClient({
@@ -115,6 +116,78 @@ export default function twitch() {
     }
 
     await command.execute(client, channel, tags, message, { io })
+  })
+
+  // client.on(
+  //   "subscription",
+  //   async (_channel, username, _methods, _message, _userstate) => {
+  //     return await subscriptionPayout(username)
+  //   }
+  // )
+
+  // client.on(
+  //   "resub",
+  //   async (_channel, username, _months, _message, _userstate, _methods) => {
+  //     return await subscriptionPayout(username)
+  //   }
+  // )
+
+  // client.on(
+  //   "subgift",
+  //   async (
+  //     channel,
+  //     username,
+  //     _streakMonths,
+  //     recipient,
+  //     _methods,
+  //     _userstate
+  //   ) => {
+  //     await commands.giveCoin(username, 10)
+  //     await subscriptionPayout(recipient)
+
+  //     await botSay(
+  //       client,
+  //       channel,
+  //       `${username} ได้รับ 10 $ARM จากการ Gift ให้ ${recipient} armKraab `
+  //     )
+  //   }
+  // )
+
+  // client.on(
+  //   "submysterygift",
+  //   async (channel, username, numberOfSubs, _methods, _userstate) => {
+  //     await commands.giveCoin(username, 10 * numberOfSubs)
+
+  //     await botSay(
+  //       client,
+  //       channel,
+  //       `${username} ได้รับ ${
+  //         10 * numberOfSubs
+  //       } $ARM จากการ Gift Sub ให้สมาชิก ${numberOfSubs} คน armKraab`
+  //     )
+
+  //     await widget.feed(
+  //       `<b class="badge bg-primary">${username}</b> ได้รับ <i class="fas fa-coins"></i> ${
+  //         10 * numberOfSubs
+  //       } $ARM จากการ Gift Sub x ${numberOfSubs}`
+  //     )
+  //   }
+  // )
+
+  client.on("cheer", async (channel, tags, _message) => {
+    const bits = Number(tags.bits!)
+    const name = tags.username!.toLowerCase()
+
+    onBits(name, bits)
+
+    await client.say(
+      channel,
+      `@${name} รับ ${bits * 3} $OULONG จาก ${bits} Bits`
+    )
+
+    io.emit("text", {
+      text: `🤗 ${name} ${bits} Bits -> ${bits * 3} $OULONG`,
+    })
   })
 
   async function disconnect(exitCode: number = 0) {
