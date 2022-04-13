@@ -1,6 +1,5 @@
 import tmi from "tmi.js"
 import fs from "node:fs"
-// import axios from "axios"
 import { createClient } from "redis"
 
 import { ITwitchCommand } from "./types"
@@ -50,60 +49,13 @@ export default function twitch() {
     }
   }
 
-  // interval = setInterval(async () => {
-  //   const chattersResponse = await axios.get(
-  //     "https://tmi.twitch.tv/group/user/narzelive/chatters",
-  //     { responseType: "json" }
-  //   )
-
-  //   const moderators = chattersResponse.data.chatters.moderators
-
-  //   // if "narzebotdev" is offline, unpause automatically
-  //   if (!moderators.includes("narzebotdev")) {
-  //     // TODO: Find better way to periodially inform prod bot to pause
-  //     if (process.env.NODE_ENV !== "production") {
-  //       await client.say("narzelive", `!pause`)
-  //       return
-  //     }
-
-  //     if (isPaused) {
-  //       isPaused = false
-  //       client.say("narzelive", `isPaused: ${isPaused}`)
-  //     }
-  //   }
-  // }, 60000)
-
   // Dev mode - set streamie-dev-mode to true
   if (process.env.NODE_ENV !== "production") {
     redisClient.set("streamie-dev-mode", "true")
-
-    // client.say(channel, "!pause")
   }
 
   client.on("message", async (channel, tags, message, self) => {
     if (self) return
-
-    // // Production bot pause
-    // // TODO: refactor to twitch-commands/pause
-    // if (
-    //   ["narzelive", "narzebotdev"].includes(tags.username!.toLowerCase()) &&
-    //   message.includes("!pause") &&
-    //   process.env.NODE_ENV === "production"
-    // ) {
-    //   isPaused = true
-    //   client.say(channel, `isPaused: ${isPaused}`)
-    //   return
-    // }
-
-    // if (
-    //   ["narzelive", "narzebotdev"].includes(tags.username!.toLowerCase()) &&
-    //   message.includes("!unpause") &&
-    //   process.env.NODE_ENV === "production"
-    // ) {
-    //   isPaused = false
-    //   client.say(channel, `isPaused: ${isPaused}`)
-    //   return
-    // }
 
     const isCommaCommand = message.startsWith(",")
     const isBangCommand = message.startsWith("!")
@@ -167,8 +119,6 @@ export default function twitch() {
 
   async function disconnect(exitCode: number = 0) {
     await redisClient.set("streamie-dev-mode", "false")
-
-    // await client.say("narzeLIVE", "!unpause")
 
     console.log("disconnect twitch client", await client.disconnect())
     console.log("disconnect redis client", await redisClient.disconnect())
