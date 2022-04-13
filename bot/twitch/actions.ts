@@ -5,12 +5,17 @@ export async function onBits(username: string, amount: number) {
   if (amount <= 0) {
     throw Error("Amount of bits must be greater than zero")
   }
+
+  const coinAmount = amount * 3
+
   await upsertUser(username)
 
-  return await prisma.user.update({
+  await prisma.user.update({
     where: { name: username.toLowerCase() },
-    data: { coin: { increment: amount * 3 } },
+    data: { coin: { increment: coinAmount } },
   })
+
+  return coinAmount
 }
 
 // On Subs

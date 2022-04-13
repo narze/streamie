@@ -4,13 +4,15 @@ import { prismaMock } from "../prisma-mock"
 
 describe("onBits", () => {
   it("gives user 3 x bits amount of coin", async () => {
-    await onBits("narzelive", 3)
+    const result = await onBits("narzelive", 3)
 
     // Assert: expect narzelive to get 9 coins
     expect(prismaMock.user.update).toBeCalledWith({
       where: { name: "narzelive".toLowerCase() },
       data: { coin: { increment: 9 } },
     })
+
+    expect(result).toEqual(9)
   })
 
   it("throws error is amount is zero", async () => {

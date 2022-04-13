@@ -178,15 +178,12 @@ export default function twitch() {
     const bits = Number(tags.bits!)
     const name = tags.username!.toLowerCase()
 
-    onBits(name, bits)
+    const coin = await onBits(name, bits)
 
-    await client.say(
-      channel,
-      `@${name} รับ ${bits * 3} $OULONG จาก ${bits} Bits`
-    )
+    await client.say(channel, `@${name} รับ ${coin} $OULONG จาก ${bits} Bits`)
 
     io.emit("text", {
-      text: `🤗 ${name} ${bits} Bits -> ${bits * 3} $OULONG`,
+      text: `🤗 ${name} ${bits} Bits -> ${coin} $OULONG`,
     })
   })
 
