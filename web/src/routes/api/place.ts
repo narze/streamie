@@ -24,7 +24,7 @@ export async function get({ url }) {
 
   data.forEach((rowData, idx) => {
     Object.keys(rowData).forEach((x) => {
-      dataArray.push([x, idx + 1, rowData[x]])
+      dataArray.push([+x, idx + 1, rowData[x]])
     })
   })
 
@@ -32,7 +32,7 @@ export async function get({ url }) {
 
   if (data) {
     return {
-      body: { data: dataArray },
+      body: { place: dataArray },
     }
   }
 

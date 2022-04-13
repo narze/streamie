@@ -1,10 +1,26 @@
+<script context="module">
+  const height = 16
+  const width = 16
+
+  export async function load({ params, fetch, session, stuff }) {
+    const url = `/api/place`
+    const response = await fetch(url)
+
+    return {
+      status: response.status,
+      props: {
+        data: response.ok && (await response.json()),
+      },
+    }
+  }
+</script>
+
 <script lang="ts">
   import { io } from "socket.io-client"
 
   import { onMount } from "svelte"
 
-  const width = 16
-  const height = 16
+  export let data: { place: Array<[number, number, string]> }
 
   const board: string[][] = Array(height)
     .fill(0)
@@ -14,7 +30,11 @@
     board[y][x] = colorHex
   }
 
-  onMount(() => {
+  function paintCache() {
+    data.place.forEach(([x, y, colorHex]) => paint(x, y, colorHex))
+  }
+
+  function connectSocket() {
     const socket = io("ws://streamie-socket.narze.live")
 
     socket.on("place", ({ x, y, c }) => {
@@ -26,6 +46,11 @@
       }
       paint(x - 1, y - 1, c)
     })
+  }
+
+  onMount(() => {
+    connectSocket()
+    paintCache()
   })
 </script>
 
