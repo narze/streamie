@@ -138,6 +138,10 @@ export default function twitch() {
       await io.emit("text", {
         text: `😍 ${name} Gift sub to @${recipient}`,
       })
+
+      await io.emit("print", {
+        text: `${name} ส่ง ${numberOfSubs} GiftSub`,
+      })
     }
   )
 
@@ -154,6 +158,10 @@ export default function twitch() {
       await io.emit("text", {
         text: `😍😍😍 ${name} Gift subs to ${numberOfSubs} people`,
       })
+
+      await io.emit("print", {
+        text: `${name} ส่ง ${numberOfSubs} GiftSubs`,
+      })
     }
   )
 
@@ -167,6 +175,10 @@ export default function twitch() {
 
     await io.emit("text", {
       text: `🤗 ${name} ${bits} Bits -> ${coin} $OULONG`,
+    })
+
+    await io.emit("print", {
+      text: `${name} ส่ง ${bits} Bits`,
     })
   })
 
@@ -190,7 +202,7 @@ export default function twitch() {
 }
 
 function subActions(client) {
-  return async (channel, name, _methods, _message, _userstate) => {
+  return async (channel, name, _methods, message, _userstate) => {
     const airdropCount = await onSub(name)
 
     await client.say(
@@ -204,6 +216,14 @@ function subActions(client) {
 
     await io.emit("text", {
       text: `✈️ Airdrop to ${airdropCount} people`,
+    })
+
+    await io.emit("print", {
+      text: `${name} Subscribed`,
+    })
+
+    await io.emit("print", {
+      text: message,
     })
   }
 }
