@@ -69,5 +69,5 @@ jobs:
       - name: Streamie
         run: make build
 
-      - name: Streamie Socket
-        run: make build-socket
+      # - name: Streamie Socket
+      #   run: make build-socket
