@@ -1,6 +1,7 @@
 {
   "name": "web",
   "version": "0.0.1",
+  "main": "build/index.js",
   "scripts": {
     "dev": "svelte-kit dev",
     "build": "svelte-kit build",

@@ -6,3 +6,14 @@ Dockerfile
 node_modules/
 
 bot/.env*
+
+**/dist
+
+# Rush temporary files
+common/deploy/
+common/temp/
+common/autoinstallers/*/.npmrc
+**/.rush/temp/
+
+# Heft
+.heft

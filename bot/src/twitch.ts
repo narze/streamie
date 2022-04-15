@@ -37,7 +37,9 @@ export default function twitch() {
   const commandFiles = fs.readdirSync("./src/twitch-commands")
 
   for (const file of commandFiles) {
-    const command: ITwitchCommand = require(`./twitch-commands/${file}`).default
+    const command: ITwitchCommand = require(`./twitch-commands/${
+      file.split(".")[0]
+    }`).default
 
     if (Array.isArray(command.name)) {
       for (const name of command.name) {
