@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest"
-import { onBits, onGiftSub, onSub } from "../../twitch/actions"
+import { onBits, onGiftSub, onSub } from "../../src/twitch/actions"
 import { prismaMock } from "../prisma-mock"
 
 describe("onBits", () => {

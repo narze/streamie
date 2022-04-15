@@ -4,6 +4,10 @@
   "main": "index.js",
   "author": "Manassarn Manoonchai",
   "license": "MIT",
+  "scripts": {
+    "start": "node .",
+    "build": "true"
+  },
   "dependencies": {
     "node-key-sender": "^1.0.11",
     "robotjs": "^0.6.0",

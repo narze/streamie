@@ -1,4 +1,4 @@
-import { ITwitchCommand } from "../types"
+import { ITwitchCommand } from "../../types"
 
 const place: ITwitchCommand = {
   name: ["!place", "!p"],

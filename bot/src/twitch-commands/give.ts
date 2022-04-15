@@ -1,5 +1,5 @@
 import prisma from "../prisma"
-import { ITwitchCommand } from "../types"
+import { ITwitchCommand } from "../../types"
 // import { isError, give as giveFn } from "../give"
 
 const give: ITwitchCommand = {

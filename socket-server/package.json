@@ -6,7 +6,8 @@
   "license": "MIT",
   "scripts": {
     "start": "node .",
-    "client": "node client.js"
+    "client": "node client.js",
+    "build": "true"
   },
   "dependencies": {
     "socket.io": "^4.4.1",

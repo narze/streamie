@@ -1,4 +1,4 @@
-import discord from "../../twitch-commands/discord"
+import discord from "../../src/twitch-commands/discord"
 import { describe, expect, it, vi } from "vitest"
 import { Client } from "tmi.js"
 

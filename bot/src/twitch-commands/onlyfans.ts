@@ -1,4 +1,4 @@
-import { ITwitchCommand } from "../types"
+import { ITwitchCommand } from "../../types"
 
 export const onlyfans: ITwitchCommand = {
   name: ["!onlyfans", "!olf"],

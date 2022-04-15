@@ -1,4 +1,4 @@
-import { ITwitchCommand } from "../types"
+import { ITwitchCommand } from "../../types"
 import { isError, gacha as gachaFn } from "../invest"
 import prisma from "../prisma"
 

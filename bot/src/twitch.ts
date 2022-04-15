@@ -2,7 +2,7 @@ import tmi from "tmi.js"
 import fs from "node:fs"
 import { createClient } from "redis"
 
-import { ITwitchCommand } from "./types"
+import { ITwitchCommand } from "../types"
 import socket from "./socket-client"
 import { onBits, onGiftSub, onSub } from "./twitch/actions"
 
@@ -34,9 +34,7 @@ export default function twitch() {
 
   const commands = new Map<string, ITwitchCommand>()
 
-  const commandFiles = fs
-    .readdirSync("./twitch-commands")
-    .filter((file: string) => file.endsWith(".ts"))
+  const commandFiles = fs.readdirSync("./src/twitch-commands")
 
   for (const file of commandFiles) {
     const command: ITwitchCommand = require(`./twitch-commands/${file}`).default

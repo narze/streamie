@@ -25,9 +25,7 @@ export default function discord() {
 
   client.commands = new Collection()
 
-  const commandFiles = fs
-    .readdirSync("./commands")
-    .filter((file: string) => file.endsWith(".ts"))
+  const commandFiles = fs.readdirSync("./src/commands")
 
   for (const file of commandFiles) {
     const command = require(`./commands/${file}`)

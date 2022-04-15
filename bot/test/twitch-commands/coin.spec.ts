@@ -1,6 +1,6 @@
 import { User } from "@prisma/client"
 import { prismaMock } from "../prisma-mock"
-import coin from "../../twitch-commands/coin"
+import coin from "../../src/twitch-commands/coin"
 import { describe, expect, it, vi } from "vitest"
 import { Client } from "tmi.js"
 

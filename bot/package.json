@@ -4,14 +4,15 @@
   "engines": {
     "node": ">=16"
   },
-  "main": "index.ts",
+  "main": "dist/index.js",
   "repository": "ssh://git@github.com/narze/streamie",
   "author": "Manassarn Manoonchai <manassarn@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "start": "ts-node .",
+    "start": "ts-node src",
+    "build": "tsc",
     "test": "NODE_ENV=test dotenv-flow -- vitest",
-    "dev": "ts-node-dev --exit-child --respawn .",
+    "dev": "ts-node-dev --exit-child --respawn src",
     "deploy-commands": "ts-node deploy-commands",
     "prisma": "dotenv-flow -- prisma"
   },

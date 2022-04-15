@@ -1,28 +1,22 @@
-import { ITwitchCommand } from "../types"
+import { ITwitchCommand } from "../../types"
 import { isError, gacha as gachaFn } from "../invest"
 import prisma from "../prisma"
 
-// Deprecated: Use !invest instead
-const gacha: ITwitchCommand = {
-  name: "!gacha",
-  execute: async (client, channel, tags, message, misc) => {
+const allin: ITwitchCommand = {
+  name: "!allin",
+  execute: async (client, channel, tags, _message, misc) => {
     const name = tags.username!.toLowerCase()
-    const [_, ...cmdArgs] = message.split(/\s+/)
+    const user = await prisma.user.findUnique({ where: { name } })
 
-    let amount = 1
-
-    if (cmdArgs.length) {
-      let group = cmdArgs[0].match(/(-?\d+)/)
-      if (group && group[1]) {
-        amount = Number.parseInt(group[1])
-      }
+    if (!user) {
+      return
     }
+
+    let amount = user.coin
 
     const gachaResult = await gachaFn(name, amount)
 
-    if (isError(gachaResult)) {
-      const user = await prisma.user.findUnique({ where: { name } })
-
+    if (amount == 0 || isError(gachaResult)) {
       await client.say(
         channel,
         `@${name} มี $OULONG ไม่พอ! (มีอยู่ ${user!.coin} $OULONG).`
@@ -50,4 +44,4 @@ const gacha: ITwitchCommand = {
   },
 }
 
-export default gacha
+export default allin

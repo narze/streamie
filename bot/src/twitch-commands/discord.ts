@@ -1,4 +1,4 @@
-import { ITwitchCommand } from "../types"
+import { ITwitchCommand } from "../../types"
 
 const discord: ITwitchCommand = {
   name: "!discord",
