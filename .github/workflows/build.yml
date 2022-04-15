@@ -19,10 +19,11 @@ jobs:
           node-version: 16.x
           # cache: "pnpm"
 
-      - name: Setup rush
-        run: |
-          node common/scripts/install-run-rush.js change -v
-          node common/scripts/install-run-rush.js install
+      # - name: Record changes
+      #   run: node common/scripts/install-run-rush.js change -v
+
+      - name: Install Rush
+        run: node common/scripts/install-run-rush.js install
 
       - name: Build
         run: node common/scripts/install-run-rush.js rebuild --verbose
