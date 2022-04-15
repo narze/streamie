@@ -399,10 +399,10 @@
     //   "packageName": "play",
     //   "projectFolder": "play"
     // },
-    {
-      "packageName": "printer",
-      "projectFolder": "printer"
-    },
+    // {
+    //   "packageName": "printer",
+    //   "projectFolder": "printer"
+    // },
     {
       "packageName": "socket-server",
       "projectFolder": "socket-server"
