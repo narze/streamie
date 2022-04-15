@@ -17,10 +17,17 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 16.x
-          cache: "yarn"
+          cache: "pnpm"
 
-      - run: yarn install --frozen-lockfile
-      - run: yarn bot test
+      - name: Setup rush
+        run: |
+          node common/scripts/install-run-rush.js change -v
+          node common/scripts/install-run-rush.js install
+
+      - name: Build
+        run: node common/scripts/install-run-rush.js rebuild --verbose
+
+      - run: pnpm -C bot test
 
   build:
     needs: [test]
