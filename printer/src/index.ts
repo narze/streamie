@@ -1,12 +1,21 @@
 import text2png from 'text2png';
 import sharp from 'sharp';
-import { io } from 'socket.io-client';
+import { io, Socket } from 'socket.io-client';
 
 import { getDevice } from './device';
 import { pack, commands } from './packet';
 import { createImageDataFromBuffer } from './png';
 
-const socket = io('ws://streamie-socket.narze.live');
+interface ServerToClientEvents {
+  say: ({ message, username }: { message: string; username: string }) => void;
+  print: ({ text }: { text: string }) => void;
+}
+
+interface ClientToServerEvents {}
+
+const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(
+  'ws://streamie-socket.narze.live'
+);
 
 socket.on('say', ({ message, username }) => {
   // console.log({ message, username, language, slow });
