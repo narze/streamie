@@ -63,7 +63,6 @@ importers:
   ../../printer:
     specifiers:
       '@size-limit/preset-small-lib': ^7.0.8
-      '@types/usb': ^2.0.5
       canvas: ^2.9.1
       crc-32: ^1.2.2
       husky: ^7.0.4
@@ -86,7 +85,6 @@ importers:
       usb: 2.3.1
     devDependencies:
       '@size-limit/preset-small-lib': 7.0.8_size-limit@7.0.8
-      '@types/usb': 2.0.5
       husky: 7.0.4
       size-limit: 7.0.8
       tsdx: 0.14.1_canvas@2.9.1
@@ -138,7 +136,7 @@ importers:
       '@typescript-eslint/eslint-plugin': 5.19.0_edcb20b406075febffd90857e23671f0
       '@typescript-eslint/parser': 5.19.0_eslint@7.32.0+typescript@4.6.3
       autoprefixer: 10.4.4_postcss@8.4.12
-      daisyui: 2.13.6_081650f2f4dba35b17265937ab2a2ec0
+      daisyui: 2.14.0_081650f2f4dba35b17265937ab2a2ec0
       eslint: 7.32.0
       eslint-config-prettier: 8.5.0_eslint@7.32.0
       eslint-plugin-svelte3: 3.4.1_eslint@7.32.0+svelte@3.47.0
@@ -2567,15 +2565,9 @@ packages:
     resolution: {integrity: sha512-rnUKPYZfrNsxXbmNOK7NuHIF6VPRPiCQnrZQwyWnl6UaoOAc0ZmQ5VRpUq4p1JwqBA2+4qDPn9EXVqzzvNUzBA==}
     dev: true
 
-  /@types/usb/2.0.5:
-    resolution: {integrity: sha512-aol2g3fGCZv+vpC+xIgVws+cdTQBKSh7q4f77XmPjUAKRUaxsAn+nfGTx2p/w/VqpF3emoJtqVeRHnYnSd4NSA==}
-    deprecated: This is a stub types definition. usb provides its own type definitions, so you do not need this installed.
-    dependencies:
-      usb: 2.3.1
-    dev: true
-
   /@types/w3c-web-usb/1.0.6:
     resolution: {integrity: sha512-cSjhgrr8g4KbPnnijAr/KJDNKa/bBa+ixYkywFRvrhvi9n1WEl7yYbtRyzE6jqNQiSxxJxoAW3STaOQwJHndaw==}
+    dev: false
 
   /@types/ws/8.5.3:
     resolution: {integrity: sha512-6YOoWjruKj1uLf3INHH7D3qTXwFfEsg1kf3c0uDdSBJwfa/llkwIjrAGV7j7mVgGNbzTQ3HiHKKDXl6bJPD97w==}
@@ -3909,8 +3901,8 @@ packages:
       cssom: 0.3.8
     dev: true
 
-  /daisyui/2.13.6_081650f2f4dba35b17265937ab2a2ec0:
-    resolution: {integrity: sha512-Z3DOqNwIKxp4og9qd64i8/eS4i3TccmmfcaKKXM/Y619FmRjKXRmKAm/GTu9qH+4W7GcVdL8IRxuw0z5GQSqvQ==}
+  /daisyui/2.14.0_081650f2f4dba35b17265937ab2a2ec0:
+    resolution: {integrity: sha512-M8Pb3iJ1qf0nrIFyBB3SSDlcq+zytsMx5QpVsUx8KerV+ruLOMqyiYY01zmrjjCG5wSKr6Rt8ObO3VXQyArNBA==}
     peerDependencies:
       autoprefixer: ^10.0.2
       postcss: ^8.1.6
@@ -7223,6 +7215,7 @@ packages:
 
   /node-addon-api/4.3.0:
     resolution: {integrity: sha512-73sE9+3UaLYYFmDsFZnqCInzPyh3MqIwZO9cw58yIqAZhONrrabrYyYe3TuIqtIiOuTXVhsGau8hcrhhwSsDIQ==}
+    dev: false
 
   /node-fetch/2.6.7:
     resolution: {integrity: sha512-ZjMPFEfVx5j+y2yF35Kzx5sF7kDzxuDj6ziH4FFbOp87zKDZNx8yExJIb05OGF4Nlt9IHFIMBkRl41VdvcNdbQ==}
@@ -7239,6 +7232,7 @@ packages:
   /node-gyp-build/4.4.0:
     resolution: {integrity: sha512-amJnQCcgtRVw9SvoebO3BKGESClrfXGCUTX9hSn1OuGQTQBOZmVd0Z0OlecpuRksKvbsUqALE8jls/ErClAPuQ==}
     hasBin: true
+    dev: false
 
   /node-int64/0.4.0:
     resolution: {integrity: sha1-h6kGXNs1XTGC2PlM4RGIuCXGijs=}
@@ -9789,6 +9783,7 @@ packages:
       '@types/w3c-web-usb': 1.0.6
       node-addon-api: 4.3.0
       node-gyp-build: 4.4.0
+    dev: false
 
   /use/3.1.1:
     resolution: {integrity: sha512-cwESVXlO3url9YWlFW/TA9cshCEhtu7IKJ/p5soJ/gGpj7vbvFrAY/eIioQ6Dw23KjZhYgiIo8HOs1nQ2vr/oQ==}
@@ -10009,7 +10004,7 @@ packages:
   /wide-align/1.1.5:
     resolution: {integrity: sha512-eDMORYaPNZ4sQIuuYPDHdQvf4gyCF9rEEV/yPxGfwPkRodwEgiMUUXTx/dex+Me0wxx53S+NgUHaP7y3MGlDmg==}
     dependencies:
-      string-width: 1.0.2
+      string-width: 4.2.3
     dev: false
 
   /word-wrap/1.2.3:
