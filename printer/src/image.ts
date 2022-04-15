@@ -1,0 +1,78 @@
+class ImageDataLine {
+  buffer: Buffer;
+
+  constructor({ width }) {
+    this.buffer = Buffer.alloc(width / 8);
+  }
+
+  _pos(i) {
+    let byte = Math.floor(i / 8);
+    let bit = 7 - (i % 8);
+    return { byte, bit };
+  }
+
+  set(i, on) {
+    let pos = this._pos(i);
+    let { buffer } = this;
+    let byte = buffer.readUInt8(pos.byte);
+    if (on) {
+      byte = byte | (1 << pos.bit);
+    } else {
+      byte = byte & ~(1 << pos.bit);
+    }
+    buffer.writeUInt8(byte, pos.byte);
+  }
+
+  get(i) {
+    let pos = this._pos(i);
+    let { buffer } = this;
+    let byte = buffer.readUInt8(pos.byte);
+    return (byte >> pos.bit) % 2 !== 0;
+  }
+}
+
+export class ImageData {
+  width;
+  lines: ImageDataLine[] = [];
+
+  constructor({ width, height }: { width: number; height?: number }) {
+    this.width = width;
+    if (height) {
+      this.lines = [...Array(height).fill(null)].map(
+        _ => new ImageDataLine({ width })
+      );
+    }
+  }
+
+  addLine() {
+    let { width } = this;
+    let line = new ImageDataLine({ width });
+    this.lines.push(line);
+    return line;
+  }
+
+  line(i) {
+    return this.lines[i];
+  }
+
+  pack({ chunk }) {
+    let { lines } = this;
+
+    while (lines.length % chunk !== 0) {
+      this.addLine();
+    }
+
+    let chunks: Buffer[] = [];
+    let i = 0;
+    let len = lines.length;
+
+    while (i < len) {
+      let slice = lines.slice(i, (i += chunk));
+      let buffers = slice.map(line => line.buffer);
+      let buffer = Buffer.concat(buffers);
+      chunks.push(buffer);
+    }
+
+    return chunks;
+  }
+}
