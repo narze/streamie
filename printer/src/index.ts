@@ -1,12 +1,30 @@
-import { getDevice } from './device';
-import { pack, commands } from './packet';
-import { createImageData, createImageDataFromBuffer } from './png';
-import fs from 'fs';
 import text2png from 'text2png';
 import sharp from 'sharp';
+import { io } from 'socket.io-client';
 
-async function run() {
-  const png = text2png('test from the buffer 2', {
+import { getDevice } from './device';
+import { pack, commands } from './packet';
+import { createImageDataFromBuffer } from './png';
+
+const socket = io('ws://streamie-socket.narze.live');
+
+socket.on('say', ({ message, username }) => {
+  // console.log({ message, username, language, slow });
+
+  // Test printing
+  if (username === 'narzelive' && message.startsWith('print ')) {
+    printText(message.split('print ')[1]);
+  }
+});
+
+socket.on('print', ({ text }) => {
+  console.log({ text });
+
+  printText(text);
+});
+
+async function printText(text: string) {
+  const png = text2png(text.match(/.{1,30}/g)!.join('\n'), {
     backgroundColor: 'white',
     padding: 2,
   });
@@ -30,8 +48,8 @@ async function run() {
   for (let i = 0; i < 1; i++) {
     let buffers = await createImageDataFromBuffer(bufferImg);
     for (let buffer of buffers) {
-      console.log(buffers[0], buffers[0].length);
-      console.log(pack(0x00, buffers[0]));
+      // console.log(buffers[0], buffers[0].length);
+      // console.log(pack(0x00, buffers[0]));
       await transfer(pack(0x00, buffer));
     }
   }
@@ -44,9 +62,9 @@ async function run() {
   // const result = await device.transferOut(2, pack(0x00, data))
   // console.log({ result })
 
-  await space(250);
+  await space(200);
 
-  process.exit(0);
+  console.log(`Printed: "${text}"`);
 }
 
-run();
+printText('Ready');
