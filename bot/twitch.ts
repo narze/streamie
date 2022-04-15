@@ -165,7 +165,7 @@ export default function twitch() {
     }
   )
 
-  client.on("cheer", async (channel, tags, _message) => {
+  client.on("cheer", async (channel, tags, message) => {
     const bits = Number(tags.bits!)
     const name = tags.username!.toLowerCase()
 
@@ -179,6 +179,10 @@ export default function twitch() {
 
     await io.emit("print", {
       text: `${name} ส่ง ${bits} Bits`,
+    })
+
+    await io.emit("print", {
+      text: message,
     })
   })
 
