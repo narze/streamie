@@ -395,10 +395,10 @@
       "packageName": "bot",
       "projectFolder": "bot"
     },
-    {
-      "packageName": "play",
-      "projectFolder": "play"
-    },
+    // { // Failing on CI
+    //   "packageName": "play",
+    //   "projectFolder": "play"
+    // },
     {
       "packageName": "printer",
       "projectFolder": "printer"
@@ -407,7 +407,6 @@
       "packageName": "socket-server",
       "projectFolder": "socket-server"
     },
-
     {
       "packageName": "web",
       "projectFolder": "web"
