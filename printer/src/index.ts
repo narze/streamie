@@ -1,22 +1,19 @@
 import { getDevice } from './device';
 import { pack, commands } from './packet';
-import { createImageData } from './png';
+import { createImageData, createImageDataFromBuffer } from './png';
 import fs from 'fs';
 import text2png from 'text2png';
 import sharp from 'sharp';
 
-fs.writeFileSync(
-  './tmp/out.png',
-  text2png('TypeScript', {
+async function run() {
+  const png = text2png('test from the buffer 2', {
     backgroundColor: 'white',
     padding: 2,
-  })
-);
+  });
 
-async function run() {
-  sharp('./tmp/out.png')
+  const bufferImg = await sharp(png)
     .resize(384)
-    .toFile('./tmp/out_resized.png');
+    .toBuffer();
 
   let { device, transfer } = await getDevice();
 
@@ -31,7 +28,7 @@ async function run() {
   await transfer(commands.paperType(0));
 
   for (let i = 0; i < 1; i++) {
-    let buffers = await createImageData();
+    let buffers = await createImageDataFromBuffer(bufferImg);
     for (let buffer of buffers) {
       console.log(buffers[0], buffers[0].length);
       console.log(pack(0x00, buffers[0]));

@@ -38,11 +38,30 @@ export const createImageData = async () => {
       let g = data[idx + 1];
       let b = data[idx + 2];
       let value = (r + g + b) / 3;
-      // if (value > 128) {
-      //   value = false;
-      // } else {
-      //   value = true;
-      // }
+      line.set(x, value <= 128);
+    }
+  }
+
+  let buffers = img.pack({ chunk: 16 });
+
+  return buffers;
+};
+
+export const createImageDataFromBuffer = async (buffer: Buffer) => {
+  let { width, height, data } = await parse(buffer);
+
+  // https://beyondloom.com/blog/dither.html
+
+  let img = new ImageData({ width });
+
+  for (let y = 0; y < height; y++) {
+    let line = img.addLine();
+    for (let x = 0; x < width; x++) {
+      var idx = (width * y + x) << 2;
+      let r = data[idx];
+      let g = data[idx + 1];
+      let b = data[idx + 2];
+      let value = (r + g + b) / 3;
       line.set(x, value <= 128);
     }
   }
