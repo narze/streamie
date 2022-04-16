@@ -1,6 +1,6 @@
 import { User } from "@prisma/client"
 import { prismaMock } from "../prisma-mock"
-import place from "../../twitch-commands/place"
+import place from "../../src/twitch-commands/place"
 import { describe, expect, it, vi } from "vitest"
 import { Client } from "tmi.js"
 import { Socket } from "socket.io-client"

@@ -1,4 +1,4 @@
-import { ITwitchCommand } from "../types"
+import { ITwitchCommand } from "../../types"
 import { upsertUser } from "../upsertUser"
 
 const register: ITwitchCommand = {

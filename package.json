@@ -4,15 +4,5 @@
   "repository": "ssh://git@github.com/narze/streamie",
   "author": "Manassarn Manoonchai <manassarn@gmail.com>",
   "license": "MIT",
-  "private": "true",
-  "scripts": {
-    "start": "yarn bot start",
-    "dev": "yarn bot dev",
-    "bot": "yarn workspace bot",
-    "web": "yarn workspace web"
-  },
-  "workspaces": [
-    "bot",
-    "web"
-  ]
+  "private": "true"
 }

@@ -31,12 +31,10 @@ interface ICommand {
 }
 
 const commands: ICommand[] = []
-const commandFiles = fs
-  .readdirSync("./commands")
-  .filter((file) => file.endsWith(".ts"))
+const commandFiles = fs.readdirSync("./src/commands")
 
 for (const file of commandFiles) {
-  const command = require(`./commands/${file}`)
+  const command = require(`./commands/${file.split(".")[0]}`)
   commands.push(command.data.toJSON())
 }
 

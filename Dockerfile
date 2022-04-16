@@ -1,37 +1,44 @@
-FROM node:16-slim as build
+FROM node:16-slim as builder
 
 RUN apt-get update
 RUN apt-get install -y openssl
 
 WORKDIR /app
 
-# Add package.json to WORKDIR and install dependencies
-COPY package.json yarn.lock ./
-RUN yarn
+RUN mkdir -p /deploy/bot
+RUN mkdir -p /deploy/web
 
-# Add source code files to WORKDIR
+RUN npm i -g @microsoft/rush
+
+COPY ./common ./common
+COPY ./rush.json .
+
+COPY ./bot/package.json ./bot/package.json
+COPY ./socket-server/package.json ./socket-server/package.json
+COPY ./web/package.json ./web/package.json
+
+RUN rush install --purge
+
 COPY . .
 
-# Install dependencies from sub-packages
-RUN yarn
+RUN rush build
+RUN rush deploy --scenario bot -t /deploy/bot
+RUN rush deploy --scenario web -t /deploy/web
 
-# Build web
-RUN yarn web build
+# Generate Prisma Client manually (rush deploy does not copy them)
+RUN cd /deploy/bot/bot && npx prisma generate
 
 FROM node:16-slim as app
+
+WORKDIR /app
 
 ENV NODE_ENV production
 
 RUN apt-get update
 RUN apt-get install -y openssl
 
-WORKDIR /app
-
-# Add package.json to WORKDIR and install dependencies
-COPY package.json yarn.lock ./
-RUN yarn
-
-COPY . .
+COPY --from=builder /deploy/bot bot
+COPY --from=builder /deploy/web web
 
 # Application port (optional)
 EXPOSE 3000
@@ -43,14 +50,11 @@ EXPOSE 9229
 # Socket.io
 EXPOSE 8080
 
-RUN npx -w bot prisma generate
-
-RUN mkdir -p web/build
-
-COPY --from=build /app/web/build web/build
+# docker run --rm -it --workdir /app/bot/bot --entrypoint node streamie-rush dist
+WORKDIR /app/bot/bot
 
 # Container start command (DO NOT CHANGE and see note below)
-CMD ["yarn", "start"]
+CMD ["node", "."]
 
 # To start using a different `npm run [name]` command (e.g. to use nodemon + debugger),
 # edit devspace.yaml:

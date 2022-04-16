@@ -1,4 +1,4 @@
-import { ITwitchCommand } from "../types"
+import { ITwitchCommand } from "../../types"
 import prisma from "../prisma"
 import axios from "axios"
 

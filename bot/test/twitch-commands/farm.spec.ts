@@ -1,6 +1,6 @@
 import { User } from "@prisma/client"
 import { prismaMock } from "../prisma-mock"
-import farm from "../../twitch-commands/farm"
+import farm from "../../src/twitch-commands/farm"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { Client } from "tmi.js"
 
