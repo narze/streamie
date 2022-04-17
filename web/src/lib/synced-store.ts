@@ -13,9 +13,9 @@ const doc = getYjsValue(store)
 // export const disconnect = () => webrtcProvider.disconnect()
 // export const connect = () => webrtcProvider.connect()
 
-export const connectRoom = () => {
-  const webrtcProvider = new WebrtcProvider("streamie-text-sync", doc as any)
-  new IndexeddbPersistence("streamie-text-sync", doc as any)
+export const connectRoom = (roomName: string = "default") => {
+  const webrtcProvider = new WebrtcProvider(`streamie-text-sync-${roomName}`, doc as any)
+  new IndexeddbPersistence(`streamie-text-sync-${roomName}`, doc as any)
 
   return webrtcProvider
 }

@@ -11,7 +11,15 @@
   $: text = $svelteStore.data["text"] || "..."
 
   onMount(() => {
-    connectRoom()
+    const room = window.location.search
+      .slice(1)
+      .split("&")
+      .find((q) => q.startsWith("room="))
+      ?.split("=")[1]
+
+    console.log({ room })
+    connectRoom(room)
+
     input.focus()
   })
 
