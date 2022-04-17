@@ -40,7 +40,13 @@
   },
   "type": "module",
   "dependencies": {
+    "@reactivedata/reactive": "^0.1.16",
+    "@syncedstore/core": "^0.3.7",
+    "@syncedstore/svelte": "^0.3.6",
     "redis": "^4.0.6",
-    "socket.io-client": "^4.4.1"
+    "socket.io-client": "^4.4.1",
+    "y-indexeddb": "^9.0.7",
+    "y-webrtc": "^10.2.2",
+    "yjs": "^13.5.34"
   }
 }
