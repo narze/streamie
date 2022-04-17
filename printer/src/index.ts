@@ -17,6 +17,22 @@ const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(
   'ws://streamie-socket.narze.live'
 );
 
+let printQueue: string[] = [];
+let isPrinting = false;
+let device, transfer;
+
+async function connectPrinter() {
+  const printer = await getDevice();
+
+  device = printer.device;
+  transfer = printer.transfer;
+
+  if (!device) {
+    console.log('no device');
+    process.exit(1);
+  }
+}
+
 socket.on('say', ({ message, username }) => {
   // console.log({ message, username, language, slow });
 
@@ -26,13 +42,34 @@ socket.on('say', ({ message, username }) => {
   }
 });
 
-socket.on('print', ({ text }) => {
+socket.on('print', async ({ text }) => {
   console.log({ text });
 
-  printText(text);
+  // await printText(text);
+
+  // Add to print queue
+  printQueue.push(text);
+  await printFromQueue();
 });
 
+async function printFromQueue() {
+  if (isPrinting || !printQueue.length) {
+    return;
+  }
+
+  const text = printQueue[0];
+
+  isPrinting = true;
+  await printText(text);
+  isPrinting = false;
+  printQueue = printQueue.slice(1);
+}
+
 async function printText(text: string) {
+  if (!text) {
+    return;
+  }
+
   const png = text2png(text.match(/.{1,30}/g)!.join('\n'), {
     backgroundColor: 'white',
     padding: 2,
@@ -42,16 +79,9 @@ async function printText(text: string) {
     .resize(384)
     .toBuffer();
 
-  let { device, transfer } = await getDevice();
-
-  if (!device) {
-    console.log('no device');
-    return;
-  }
-
   let space = (v = 1) => transfer(commands.printFeedLine(v));
 
-  await space(150);
+  // await space(50);
   await transfer(commands.paperType(0));
 
   for (let i = 0; i < 1; i++) {
@@ -76,4 +106,11 @@ async function printText(text: string) {
   console.log(`Printed: "${text}"`);
 }
 
-printText('Ready');
+(async () => {
+  await connectPrinter();
+  printQueue.push('Printer is ready,  Bit/Sub to see it in action!');
+})();
+
+setInterval(() => {
+  printFromQueue();
+}, 5000);
