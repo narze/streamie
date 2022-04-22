@@ -6,7 +6,8 @@ export const post: RequestHandler = async (event) => {
 
   console.log({ payload })
 
-  const socket = io("ws://streamie-socket.narze.live")
+  // TODO: Extract to env
+  const socket = io("ws://streamie-web.streamie.svc.cluster.local:8888")
 
   const promise = new Promise((resolve, _reject) => {
     socket.on("connect", async () => {
