@@ -47,9 +47,11 @@
   }
 
   function addToReadQueue(message: string, language: string = "th", slow: boolean = false) {
-    if (!canRead) {
+    if (!canRead(message)) {
       return
     }
+
+    message = encodeURIComponent(message)
 
     const audio = new Audio(
       `https://tts-api.vercel.app/api/tts?text=${message}&lang=${language}&slow=${slow ? "1" : ""}`
