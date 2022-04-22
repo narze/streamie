@@ -1,4 +1,6 @@
 <script context="module" lang="ts">
+  export const prerender = false // Force getSession even if using node adapter
+
   import { browser } from "$app/env"
   import type { Load } from "@sveltejs/kit"
 
