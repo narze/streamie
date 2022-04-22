@@ -38,6 +38,11 @@ jobs:
     needs: [test]
 
     runs-on: ubuntu-latest
+    env:
+      VITE_DISCORD_OAUTH_REDIRECT_URL: ${{ secrets.VITE_DISCORD_OAUTH_REDIRECT_URL }}
+      VITE_HOST: ${{ secrets.VITE_HOST }}
+      VITE_DISCORD_CLIENT_ID: ${{ secrets.VITE_DISCORD_CLIENT_ID }}
+      VITE_DISCORD_CLIENT_SECRET: ${{ secrets.VITE_DISCORD_CLIENT_SECRET }}
 
     steps:
       - uses: actions/checkout@v3

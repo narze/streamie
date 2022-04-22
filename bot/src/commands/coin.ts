@@ -18,7 +18,7 @@ module.exports = {
       await interaction.reply(`คุณ ${discordUsername} มี ${user.coin} $OULONG`)
     } else {
       await interaction.reply(
-        `คุณยังไม่ได้ผูกบัญชี Twitch กับ Discord [TODO: login url]`
+        `คุณยังไม่ได้ผูกบัญชี Twitch กับ Discord -> https://streamie-public.narze.live/pub`
       )
     }
   },
