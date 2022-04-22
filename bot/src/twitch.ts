@@ -64,7 +64,7 @@ export default function twitch() {
     if (isCommaCommand || isBangCommand) {
       const commandStr = message.replace(/^[,!](\s*)(\w+)$/, "$2")
 
-      console.log({ commandStr })
+      console.log({ commandStr, tags })
 
       if (commandStr) {
         switch (commandStr) {

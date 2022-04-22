@@ -13,15 +13,16 @@ datasource db {
 }
 
 model User {
-  id       String    @id(map: "primary") @default(uuid())
-  name     String    @unique @db.VarChar()
-  coin     Int       @default(0) @db.Integer()
-  farmedAt DateTime? @db.Timestamptz()
-  // email String @unique @db.VarChar(255)
-  // Post    Post[]
-  // Profile Profile?
+  id        String    @id(map: "primary") @default(uuid())
+  name      String    @unique @db.VarChar()
+  coin      Int       @default(0) @db.Integer()
+  farmedAt  DateTime? @db.Timestamptz()
+  twitchId  String?   @db.VarChar()
+  discordId String?   @db.VarChar()
 
   @@index([name])
   @@index([coin])
   @@index([farmedAt])
+  @@index([twitchId])
+  @@index([discordId])
 }
