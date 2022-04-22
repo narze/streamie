@@ -43,6 +43,7 @@ jobs:
       VITE_HOST: ${{ secrets.VITE_HOST }}
       VITE_DISCORD_CLIENT_ID: ${{ secrets.VITE_DISCORD_CLIENT_ID }}
       VITE_DISCORD_CLIENT_SECRET: ${{ secrets.VITE_DISCORD_CLIENT_SECRET }}
+      VITE_STREAMIE_SOCKET_IO_SERVER_URL: ${{ secrets.VITE_STREAMIE_SOCKET_IO_SERVER_URL }}
 
     steps:
       - uses: actions/checkout@v3
