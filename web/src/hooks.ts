@@ -13,7 +13,6 @@ async function getDiscordUser(access_token: string) {
 
 export const handle: Handle = async ({ event, resolve }) => {
   const cookies = cookie.parse(event.request.headers.get("cookie") || "")
-  console.log("handle", { cookies })
 
   // if only refresh token is found, then access token has expired. perform a refresh on it (in getSession).
   if (cookies.refresh_token && !cookies.access_token) {
@@ -28,8 +27,6 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 export const getSession: GetSession = async (event) => {
   const cookies = cookie.parse(event.request.headers.get("cookie") || "")
-
-  console.log("getSession", { cookies })
 
   const session = {}
 

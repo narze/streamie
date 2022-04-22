@@ -11,7 +11,6 @@
   const authUrl = `https://discord.com/api/oauth2/authorize?client_id=${DISCORD_CLIENT_ID}&redirect_uri=${DISCORD_OAUTH_REDIRECT_URI}&response_type=code&scope=identify%20connections`
 
   export const load: Load = async ({ session, fetch }) => {
-    console.log({ session })
     // Receives refreshed tokens from session & store it to httpOnly cookie
     if (session["tokens"] && browser) {
       await fetch("/pub/store_session", {
@@ -30,7 +29,6 @@
   import { session } from "$app/stores"
   export let user
 
-  $: console.log({ user, browser })
   $: if (user && browser) {
     fetchConnections()
   }
