@@ -1,11 +1,12 @@
 import { SlashCommandBuilder } from "@discordjs/builders"
+import { CommandInteraction } from "discord.js"
 import prisma from "../prisma"
 
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("coin")
     .setDescription("Query for your $OULONG"),
-  async execute(interaction) {
+  async execute(interaction: CommandInteraction) {
     const discordId = interaction.user.id
     const discordUsername = interaction.user.username
 
@@ -17,9 +18,9 @@ module.exports = {
     if (user) {
       await interaction.reply(`คุณ ${discordUsername} มี ${user.coin} $OULONG`)
     } else {
-      await interaction.reply(
-        `คุณยังไม่ได้ผูกบัญชี Twitch กับ Discord -> https://streamie-public.narze.live/pub`
-      )
+      const content = `คุณยังไม่ได้ผูกบัญชี Twitch กับ Discord -> https://streamie-public.narze.live/pub`
+
+      await interaction.reply({ content, ephemeral: true })
     }
   },
 }
