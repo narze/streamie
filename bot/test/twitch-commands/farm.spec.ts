@@ -41,6 +41,8 @@ describe("execute", () => {
       name: "narzelive",
       coin: 42,
       farmedAt: null,
+      twitchId: null,
+      discordId: null,
     }
 
     prismaMock.user.upsert.mockResolvedValue(user)

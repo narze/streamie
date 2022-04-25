@@ -6,6 +6,17 @@ import { Client } from "tmi.js"
 import { Socket } from "socket.io-client"
 import { createClient } from "redis"
 
+vi.mock("axios", () => ({
+  __esModule: true,
+  default: {
+    get: vi.fn().mockResolvedValue({
+      data: {
+        data: [{ type: "live" }],
+      },
+    }),
+  },
+}))
+
 it("exists", () => {
   expect(place).toBeDefined()
 })
