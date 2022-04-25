@@ -6,8 +6,9 @@ const coin: ITwitchCommand = {
   name: ["!coin", "!c"],
   execute: async (client, channel, tags, _message) => {
     const name = tags.username!.toLowerCase()
+    const id = tags["user-id"]
 
-    await upsertUser(name)
+    await upsertUser(name, id)
 
     const user = await prisma.user.findUnique({ where: { name } })
 

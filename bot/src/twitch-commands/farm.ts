@@ -7,6 +7,7 @@ const farm: ITwitchCommand = {
   name: ["!farm", "!f"],
   execute: async (client, channel, tags, _message, misc) => {
     const name = tags.username!.toLowerCase()
+    const id = tags["user-id"]
 
     // Get streams
     const twitchToken = process.env.TWITCH_HELIX_OAUTH_TOKEN!
@@ -28,7 +29,7 @@ const farm: ITwitchCommand = {
       farmAmount = 5 + Math.ceil(Math.random() * 5)
     }
 
-    const user = await upsertUser(name)
+    const user = await upsertUser(name, id)
 
     // check if farmedAt is not null
     if (user.farmedAt) {

@@ -34,7 +34,7 @@ const commands: ICommand[] = []
 const commandFiles = fs.readdirSync("./src/commands")
 
 for (const file of commandFiles) {
-  const command = require(`./commands/${file.split(".")[0]}`)
+  const command = require(`./src/commands/${file.split(".")[0]}`)
   commands.push(command.data.toJSON())
 }
 
