@@ -6,6 +6,8 @@ import { ITwitchCommand } from "../types"
 import socket from "./socket-client"
 import { onBits, onGiftSub, onSub } from "./twitch/actions"
 
+const MIN_BITS_TO_PRINT = 10
+
 const io = socket()
 const redisClient = createClient({
   url: process.env.REDIS_URL,
@@ -177,13 +179,15 @@ export default function twitch() {
       text: `🤗 ${name} ${bits} Bits -> ${coin} $OULONG`,
     })
 
-    await io.emit("print", {
-      text: `${name} ส่ง ${bits} Bits`,
-    })
+    if (bits >= MIN_BITS_TO_PRINT) {
+      await io.emit("print", {
+        text: `${name} ส่ง ${bits} Bits`,
+      })
 
-    await io.emit("print", {
-      text: message,
-    })
+      await io.emit("print", {
+        text: message,
+      })
+    }
   })
 
   async function disconnect(exitCode: number = 0) {
