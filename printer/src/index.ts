@@ -48,7 +48,7 @@ socket.on('print', async ({ text }) => {
   // await printText(text);
 
   // Add to print queue
-  printQueue.push(text);
+  printQueue.push(text.substring(0, 50));
   await printFromQueue();
 });
 
