@@ -1,24 +1,54 @@
 <script lang="ts">
-  const DEFAULT_TIMER = 60 * 25
-  let timer = DEFAULT_TIMER
-  let timerInterval
-  let isRunning = false
+  const DEFAULT_WORK_TIMER = 60 * 25
+  const DEFAULT_BREAK_TIMER = 60 * 5
+  const TICK = 1
+  let workTimer = DEFAULT_WORK_TIMER
+  let breakTimer = DEFAULT_BREAK_TIMER
+  let workTimerInterval
+  let breakTimerInterval
+  let isPaused = false
+
+  let state = "idle"
+  $: isIdle = state == "idle"
+  $: isRunning = state == "work"
+  $: isBreak = state == "break"
+  $: isBreakEnd = state == "break-end"
 
   function startTimer() {
-    isRunning = true
-    timerInterval = setInterval(() => {
-      timer -= 1
-    }, 1000)
+    state = "work"
+    isPaused = false
+    workTimerInterval = setInterval(() => {
+      workTimer -= 1
+      if (workTimer < 0) {
+        startBreakTimer()
+        clearInterval(workTimerInterval)
+      }
+    }, TICK)
+  }
+
+  function startBreakTimer() {
+    state = "break"
+    breakTimerInterval = setInterval(() => {
+      breakTimer -= 1
+      if (breakTimer < 0) {
+        clearInterval(breakTimerInterval)
+        state = "break-end"
+      }
+    }, TICK)
   }
 
   function pauseTimer() {
-    isRunning = false
-    clearInterval(timerInterval)
+    isPaused = true
+    clearInterval(workTimerInterval)
   }
 
   function resetTimer() {
     pauseTimer()
-    timer = DEFAULT_TIMER
+    clearInterval(breakTimerInterval)
+
+    workTimer = DEFAULT_WORK_TIMER
+    breakTimer = DEFAULT_BREAK_TIMER
+    state = "idle"
   }
 
   function toMMSS(seconds: number) {
@@ -29,19 +59,39 @@
 <div class="min-h-screen w-full flex items-center justify-center">
   <div class="border border-white rounded p-8">
     <div class="flex flex-col gap-4">
-      <div class="text-4xl">Pomodoro</div>
-      <div class="text-3xl text-center">
-        {toMMSS(timer)}
-        {isRunning ? "▶️" : "⏸"}
-      </div>
+      {#if isIdle}
+        <div class="text-4xl">Pomodoro</div>
+        <div class="text-3xl text-center">
+          {toMMSS(workTimer)}
+        </div>
 
-      {#if isRunning}
-        <button on:click={pauseTimer} class="btn">Pause</button>
-      {:else}
         <button on:click={startTimer} class="btn">Start</button>
-      {/if}
+      {:else if isRunning}
+        <div class="text-4xl">Pomodoro</div>
+        <div class="text-3xl text-center">
+          {toMMSS(workTimer)}
+          {!isPaused ? "▶️" : "⏸"}
+        </div>
 
-      <button class="btn" on:click={resetTimer}>Reset</button>
+        {#if isPaused}
+          <button on:click={startTimer} class="btn">Start</button>
+        {:else}
+          <button on:click={pauseTimer} class="btn">Pause</button>
+        {/if}
+
+        <button class="btn" on:click={resetTimer}>Reset</button>
+      {:else if isBreak}
+        <div class="text-4xl">Break ☕️</div>
+        <div class="text-3xl text-center">
+          {toMMSS(breakTimer)}
+        </div>
+        <button class="btn" on:click={resetTimer}>End Break</button>
+      {:else if isBreakEnd}
+        <div class="text-3xl text-center">Break Ended</div>
+        <button on:click={resetTimer} class="btn">Restart</button>
+      {:else}
+        Unknown state
+      {/if}
     </div>
   </div>
 </div>
