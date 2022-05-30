@@ -1,7 +1,10 @@
 <script lang="ts">
+  import { onMount } from "svelte"
+  import { io } from "socket.io-client"
+
   const DEFAULT_WORK_TIMER = 60 * 25
   const DEFAULT_BREAK_TIMER = 60 * 5
-  const TICK = 1
+  const TICK = 1000
   let workTimer = DEFAULT_WORK_TIMER
   let breakTimer = DEFAULT_BREAK_TIMER
   let workTimerInterval
@@ -14,9 +17,31 @@
   $: isBreak = state == "break"
   $: isBreakEnd = state == "break-end"
 
+  onMount(() => {
+    const socket = io("ws://streamie-socket.narze.live")
+
+    socket.on("pomodoro", ({ minutes, command }) => {
+      if (command == "pause") {
+        pauseTimer()
+        return
+      } else if (command == "resume") {
+        startTimer()
+        return
+      } else if (command == "reset") {
+        resetTimer()
+        return
+      }
+
+      workTimer = 60 * minutes
+      startTimer()
+    })
+  })
+
   function startTimer() {
     state = "work"
     isPaused = false
+    clearInterval(workTimerInterval)
+
     workTimerInterval = setInterval(() => {
       workTimer -= 1
       if (workTimer < 0) {
@@ -28,6 +53,7 @@
 
   function startBreakTimer() {
     state = "break"
+    clearInterval(breakTimerInterval)
     breakTimerInterval = setInterval(() => {
       breakTimer -= 1
       if (breakTimer < 0) {
