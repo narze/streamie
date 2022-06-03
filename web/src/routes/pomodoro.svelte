@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte"
   import { io } from "socket.io-client"
+  import { Howl } from "howler"
 
   const DEFAULT_WORK_TIMER = 60 * 25
   const DEFAULT_BREAK_TIMER = 60 * 5
@@ -17,6 +18,12 @@
   $: isRunning = state == "work"
   $: isBreak = state == "break"
   $: isBreakEnd = state == "break-end"
+
+  const alarm = new Howl({
+    src: ["/sounds/alarm.mp3"],
+    volume: 0.3,
+    // autoplay: true,
+  })
 
   onMount(() => {
     const socket = io("ws://streamie-socket.narze.live")
@@ -52,6 +59,7 @@
     workTimerInterval = setInterval(() => {
       workTimer -= 1
       if (workTimer < 0) {
+        alarm.play()
         startBreakTimer()
         clearInterval(workTimerInterval)
       }
@@ -64,6 +72,7 @@
     breakTimerInterval = setInterval(() => {
       breakTimer -= 1
       if (breakTimer < 0) {
+        alarm.play()
         clearInterval(breakTimerInterval)
         state = "break-end"
       }
