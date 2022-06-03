@@ -13,11 +13,12 @@ const pomodoro: ITwitchCommand = {
     let minutes = 25
 
     if (cmdArgs.length) {
-      if (["pause", "resume", "reset"].includes(cmdArgs[0])) {
+      if (cmdArgs[0].match(/^[a-zA-Z]+$/)) {
         const command = cmdArgs[0]
 
         await misc?.io?.emit("pomodoro", {
           command,
+          args: cmdArgs.slice(1),
         })
         return
       }
