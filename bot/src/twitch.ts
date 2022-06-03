@@ -5,6 +5,7 @@ import { createClient } from "redis"
 import { ITwitchCommand } from "../types"
 import socket from "./socket-client"
 import { onBits, onGiftSub, onSub } from "./twitch/actions"
+import { isAutosayEnabled } from "./twitch-commands/autosay"
 
 const MIN_BITS_TO_PRINT = 10
 
@@ -105,6 +106,14 @@ export default function twitch() {
     const command = commands.get(commandStr)
 
     if (!command) {
+      const name = tags.username!.toLowerCase()
+      if (name === "narzelive" && isAutosayEnabled()) {
+        await io.emit("say", {
+          message,
+          username: name,
+        })
+        return
+      }
       return
     }
 
