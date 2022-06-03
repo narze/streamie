@@ -83,7 +83,7 @@
 </script>
 
 <div class="min-h-screen w-full flex items-center justify-center">
-  <div class="border border-white rounded p-8">
+  <div class="rounded-3xl bg-zinc-900 p-8">
     <div class="flex flex-col gap-4">
       {#if isIdle}
         <div class="text-4xl">Pomodoro</div>
@@ -91,7 +91,7 @@
           {toMMSS(workTimer)}
         </div>
 
-        <button on:click={startTimer} class="btn">Start</button>
+        <button on:click={startTimer} class="btn btn-outline">Start</button>
       {:else if isRunning}
         <div class="text-4xl">Pomodoro</div>
         <div class="text-3xl text-center">
@@ -100,21 +100,21 @@
         </div>
 
         {#if isPaused}
-          <button on:click={startTimer} class="btn">Start</button>
+          <button on:click={startTimer} class="btn btn-outline">Start</button>
         {:else}
-          <button on:click={pauseTimer} class="btn">Pause</button>
+          <button on:click={pauseTimer} class="btn btn-outline">Pause</button>
         {/if}
 
-        <button class="btn" on:click={resetTimer}>Reset</button>
+        <button class="btn btn-outline" on:click={resetTimer}>Reset</button>
       {:else if isBreak}
         <div class="text-4xl">Break ☕️</div>
         <div class="text-3xl text-center">
           {toMMSS(breakTimer)}
         </div>
-        <button class="btn" on:click={resetTimer}>End Break</button>
+        <button class="btn btn-outline" on:click={resetTimer}>End Break</button>
       {:else if isBreakEnd}
         <div class="text-3xl text-center">Break Ended</div>
-        <button on:click={resetTimer} class="btn">Restart</button>
+        <button on:click={resetTimer} class="btn btn-outline">Restart</button>
       {:else}
         Unknown state
       {/if}
