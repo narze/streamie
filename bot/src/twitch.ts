@@ -107,7 +107,11 @@ export default function twitch() {
 
     if (!command) {
       const name = tags.username!.toLowerCase()
-      if (name === "narzelive" && isAutosayEnabled()) {
+      if (
+        name === "narzelive" &&
+        isAutosayEnabled() &&
+        !message.startsWith("!")
+      ) {
         await io.emit("say", {
           message,
           username: name,
