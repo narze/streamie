@@ -4,7 +4,7 @@
   import { Howl } from "howler"
   import { page } from "$app/stores"
 
-  const noControls = !!$page.url.searchParams.get("nocontrols")
+  const controls = !!$page.url.searchParams.get("controls")
 
   const DEFAULT_WORK_TIMER = 60 * 25
   const DEFAULT_BREAK_TIMER = 60 * 5
@@ -110,7 +110,7 @@
 
 <div class="min-h-screen w-full flex items-center justify-center">
   {#if enabled}
-    <div class="rounded-3xl bg-zinc-900 p-8 h-48 flex items-center">
+    <div class="rounded-3xl bg-zinc-900 p-8 min-h-48 flex items-center">
       <div class="flex flex-col gap-4">
         {#if isIdle}
           <div class="text-4xl">Pomodoro</div>
@@ -118,7 +118,7 @@
             {toMMSS(workTimer)}
           </div>
 
-          {#if !noControls}
+          {#if controls}
             <button on:click={startTimer} class="btn btn-outline">Start</button>
           {/if}
         {:else if isRunning}
@@ -128,7 +128,7 @@
             {toMMSS(workTimer)}
           </div>
 
-          {#if !noControls}
+          {#if controls}
             {#if isPaused}
               <button on:click={startTimer} class="btn btn-outline">Start</button>
             {:else}
@@ -142,13 +142,13 @@
           <div class="text-3xl text-center">
             {toMMSS(breakTimer)}
           </div>
-          {#if !noControls}
+          {#if controls}
             <button class="btn btn-outline" on:click={resetTimer}>End Break</button>
           {/if}
         {:else if isBreakEnd}
           <div class="text-4xl">Pomodoro</div>
           <div class="text-3xl text-center">Break Ended</div>
-          {#if !noControls}
+          {#if controls}
             <button on:click={resetTimer} class="btn btn-outline">Restart</button>
           {/if}
         {:else}
