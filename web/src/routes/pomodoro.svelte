@@ -4,8 +4,6 @@
   import { Howl } from "howler"
   import { page } from "$app/stores"
 
-  const controls = !!$page.url.searchParams.get("controls")
-
   const DEFAULT_WORK_TIMER = 60 * 25
   const DEFAULT_BREAK_TIMER = 60 * 5
   const TICK = 1000
@@ -15,6 +13,7 @@
   let breakTimerInterval
   let isPaused = false
   let enabled = true
+  let controls = false
 
   let state = "idle"
   $: isIdle = state == "idle"
@@ -51,6 +50,8 @@
   }
 
   onMount(() => {
+    controls = !!$page.url.searchParams.get("controls")
+
     window["command"] = onCommand
 
     const socket = io("ws://streamie-socket.narze.live")
