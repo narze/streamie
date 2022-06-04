@@ -42,7 +42,7 @@ export async function gacha(
   let result = {
     bet,
     win: 0,
-    state: "lose",
+    state: "win",
     balance: 0,
   }
 
@@ -52,7 +52,6 @@ export async function gacha(
   coin += investReturn
 
   result.win = investReturn
-  result.state = "win"
   result.balance = coin
 
   await prisma.user.update({

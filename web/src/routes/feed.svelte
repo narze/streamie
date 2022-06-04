@@ -29,11 +29,14 @@
       console.log({ data, name })
       msgIdx += 1
 
-      if (data.state === "win") {
-        addTempMessage(msgIdx, `@${name} +${data.win} $OULONG 🤑 (${data.balance})`)
-      } else {
-        addTempMessage(msgIdx, `@${name} -${data.bet} $OULONG 💸 (${data.balance})`)
-      }
+      const win = data.win > data.bet
+
+      addTempMessage(
+        msgIdx,
+        `@${name} ${win ? "📈" : "🧂"} ${win ? "+" : ""}${data.win - data.bet} $OULONG (${
+          data.balance
+        })`
+      )
     })
 
     socket.on("text", ({ text }) => {

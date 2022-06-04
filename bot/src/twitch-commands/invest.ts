@@ -27,19 +27,16 @@ const invest: ITwitchCommand = {
         `@${name} มี $OULONG ไม่พอ! (มีอยู่ ${user!.coin} $OULONG).`
       )
     } else {
-      if (gachaResult.data.state == "win") {
-        await client.say(
-          channel,
-          `@${name} ลงทุน ${gachaResult.data.bet} -> ได้ผลตอบแทน ${gachaResult.data.win} $OULONG (${gachaResult.data.balance}).`
-        )
-      } else if (gachaResult.data.state == "lose") {
-        // TODO: remove this
+      const win = gachaResult.data.win > gachaResult.data.bet
 
-        await client.say(
-          channel,
-          `@${name} ลงทุน ${gachaResult.data.bet} $OULONG -> แตก! (${gachaResult.data.balance}).`
-        )
-      }
+      await client.say(
+        channel,
+        `@${name} ${win ? "📈" : "🧂"} ลงทุน ${
+          gachaResult.data.bet
+        } -> ได้ผลตอบแทน ${gachaResult.data.win} $OULONG (${
+          gachaResult.data.balance
+        })`
+      )
 
       misc?.io?.emit("gacha", {
         data: gachaResult.data,
