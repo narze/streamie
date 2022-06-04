@@ -110,7 +110,9 @@ export default function twitch() {
       if (
         name === "narzelive" &&
         isAutosayEnabled() &&
-        !message.startsWith("!")
+        !message.startsWith("!") &&
+        !message.startsWith(":") &&
+        !message.startsWith("http")
       ) {
         await io.emit("say", {
           message,
