@@ -2,6 +2,9 @@
   import { onMount } from "svelte"
   import { io } from "socket.io-client"
   import { Howl } from "howler"
+  import { page } from "$app/stores"
+
+  const noControls = !!$page.url.searchParams.get("nocontrols")
 
   const DEFAULT_WORK_TIMER = 60 * 25
   const DEFAULT_BREAK_TIMER = 60 * 5
@@ -11,7 +14,7 @@
   let workTimerInterval
   let breakTimerInterval
   let isPaused = false
-  let enabled = false
+  let enabled = true
 
   let state = "idle"
   $: isIdle = state == "idle"
@@ -25,29 +28,35 @@
     // autoplay: true,
   })
 
+  function onCommand(command: string, minutes: number = 25) {
+    if (command == "pause") {
+      pauseTimer()
+      return
+    } else if (command == "resume" || command == "start") {
+      startTimer()
+      return
+    } else if (command == "reset") {
+      resetTimer()
+      return
+    } else if (command == "enable") {
+      enabled = true
+      return
+    } else if (command == "disable") {
+      enabled = false
+      return
+    }
+
+    workTimer = 60 * minutes
+    startTimer()
+  }
+
   onMount(() => {
+    window["command"] = onCommand
+
     const socket = io("ws://streamie-socket.narze.live")
 
     socket.on("pomodoro", ({ minutes, command }) => {
-      if (command == "pause") {
-        pauseTimer()
-        return
-      } else if (command == "resume") {
-        startTimer()
-        return
-      } else if (command == "reset") {
-        resetTimer()
-        return
-      } else if (command == "enable") {
-        enabled = true
-        return
-      } else if (command == "disable") {
-        enabled = false
-        return
-      }
-
-      workTimer = 60 * minutes
-      startTimer()
+      onCommand(command, minutes)
     })
   })
 
@@ -101,7 +110,7 @@
 
 <div class="min-h-screen w-full flex items-center justify-center">
   {#if enabled}
-    <div class="rounded-3xl bg-zinc-900 p-8">
+    <div class="rounded-3xl bg-zinc-900 p-8 h-48 flex items-center">
       <div class="flex flex-col gap-4">
         {#if isIdle}
           <div class="text-4xl">Pomodoro</div>
@@ -109,30 +118,39 @@
             {toMMSS(workTimer)}
           </div>
 
-          <button on:click={startTimer} class="btn btn-outline">Start</button>
+          {#if !noControls}
+            <button on:click={startTimer} class="btn btn-outline">Start</button>
+          {/if}
         {:else if isRunning}
           <div class="text-4xl">Pomodoro</div>
           <div class="text-3xl text-center">
+            {isPaused ? "⏸" : "▶️"}
             {toMMSS(workTimer)}
-            {!isPaused ? "▶️" : "⏸"}
           </div>
 
-          {#if isPaused}
-            <button on:click={startTimer} class="btn btn-outline">Start</button>
-          {:else}
-            <button on:click={pauseTimer} class="btn btn-outline">Pause</button>
-          {/if}
+          {#if !noControls}
+            {#if isPaused}
+              <button on:click={startTimer} class="btn btn-outline">Start</button>
+            {:else}
+              <button on:click={pauseTimer} class="btn btn-outline">Pause</button>
+            {/if}
 
-          <button class="btn btn-outline" on:click={resetTimer}>Reset</button>
+            <button class="btn btn-outline" on:click={resetTimer}>Reset</button>
+          {/if}
         {:else if isBreak}
           <div class="text-4xl">Break ☕️</div>
           <div class="text-3xl text-center">
             {toMMSS(breakTimer)}
           </div>
-          <button class="btn btn-outline" on:click={resetTimer}>End Break</button>
+          {#if !noControls}
+            <button class="btn btn-outline" on:click={resetTimer}>End Break</button>
+          {/if}
         {:else if isBreakEnd}
+          <div class="text-4xl">Pomodoro</div>
           <div class="text-3xl text-center">Break Ended</div>
-          <button on:click={resetTimer} class="btn btn-outline">Restart</button>
+          {#if !noControls}
+            <button on:click={resetTimer} class="btn btn-outline">Restart</button>
+          {/if}
         {:else}
           Unknown state
         {/if}
