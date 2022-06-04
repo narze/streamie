@@ -68,6 +68,7 @@
 
   function startBreakTimer() {
     state = "break"
+    breakTimer = DEFAULT_BREAK_TIMER
     clearInterval(breakTimerInterval)
     breakTimerInterval = setInterval(() => {
       breakTimer -= 1
