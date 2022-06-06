@@ -174,6 +174,7 @@
         break
 
       default:
+        send(command.toUpperCase())
         break
     }
   }
