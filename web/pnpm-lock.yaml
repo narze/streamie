@@ -15,6 +15,7 @@ specifiers:
   axios: ^0.26.1
   cookie: ^0.5.0
   daisyui: ^2.6.0
+  dayjs: ^1.11.2
   eslint: ^7.32.0
   eslint-config-prettier: ^8.3.0
   eslint-plugin-svelte3: ^3.2.1
@@ -33,6 +34,7 @@ specifiers:
   tslib: ^2.3.1
   typescript: ~4.6.2
   vh-check: ^2.0.5
+  xstate: ^4.32.1
   y-indexeddb: ^9.0.7
   y-webrtc: ^10.2.2
   yjs: ^13.5.34
@@ -44,10 +46,12 @@ dependencies:
   '@tailwindcss/typography': 0.5.2
   axios: 0.26.1
   cookie: 0.5.0
+  dayjs: 1.11.2
   howler: 2.2.3
   qs: 6.10.3
   redis: 4.0.6
   socket.io-client: 4.4.1
+  xstate: 4.32.1
   y-indexeddb: 9.0.7_yjs@13.5.34
   y-webrtc: 10.2.2
   yjs: 13.5.34
@@ -1440,6 +1444,10 @@ packages:
     transitivePeerDependencies:
       - ts-node
     dev: true
+
+  /dayjs/1.11.2:
+    resolution: {integrity: sha512-F4LXf1OeU9hrSYRPTTj/6FbO4HTjPKXvEIC1P2kcnFurViINCVk3ZV0xAS3XVx9MkMsXbbqlK6hjseaYbgKEHw==}
+    dev: false
 
   /debug/4.3.3:
     resolution: {integrity: sha512-/zxw5+vh1Tfv+4Qn7a5nsbcJKPaSvCDhojn6FEl9vupwK2VCSDtEiEtqr8DFtzYFOdz63LBkxec7DYuc2jon6Q==}
@@ -3503,6 +3511,10 @@ packages:
   /xmlhttprequest-ssl/2.0.0:
     resolution: {integrity: sha512-QKxVRxiRACQcVuQEYFsI1hhkrMlrXHPegbbd1yn9UHOmRxY+si12nQYzri3vbzt8VdTTRviqcKxcyllFas5z2A==}
     engines: {node: '>=0.4.0'}
+    dev: false
+
+  /xstate/4.32.1:
+    resolution: {integrity: sha512-QYUd+3GkXZ8i6qdixnOn28bL3EvA++LONYL/EMWwKlFSh/hiLndJ8YTnz77FDs+JUXcwU7NZJg7qoezoRHc4GQ==}
     dev: false
 
   /xtend/4.0.2:
