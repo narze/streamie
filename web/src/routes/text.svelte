@@ -8,8 +8,6 @@
 
   import { svelteStore, connectRoom } from "../lib/synced-store"
 
-  let input: HTMLInputElement
-
   $: text = $svelteStore.data["text"] || " "
 
   onMount(() => {
@@ -41,7 +39,6 @@
     type="text"
     class="w-full h-full text-2xl p-2 text-center"
     value={text}
-    bind:this={input}
     on:keyup={onType}
   />
 </main>

@@ -8,12 +8,12 @@
   import { useMachine } from "$lib/useMachine"
   import axios from "axios"
 
+  const socket = io("ws://streamie-socket.narze.live")
+
   const DEFAULT_WORK_TIMER = 60 * 25
   const DEFAULT_BREAK_TIMER = 60 * 5
   let workTimer = DEFAULT_WORK_TIMER
   let breakTimer = DEFAULT_BREAK_TIMER
-  let workTimerInterval
-  let breakTimerInterval
   let enabled = true
   let controls = false
 
@@ -55,6 +55,11 @@
         on: {
           START: {
             target: "work",
+            actions: () => {
+              socket.emit("send_twitch_message", {
+                message: `Starting Pomodoro (${workTimer / 60}/${breakTimer / 60})`,
+              })
+            },
           },
         },
       },
@@ -67,6 +72,11 @@
             on: {
               PAUSE: {
                 target: "paused",
+                actions: () => {
+                  socket.emit("send_twitch_message", {
+                    message: `Pomodoro Paused`,
+                  })
+                },
               },
             },
           },
@@ -75,10 +85,17 @@
             on: {
               RESUME: {
                 target: "working",
-                actions: () => {
-                  console.log("resume")
-                  workEndTime = dayjs().add(diffTime + 1, "second")
-                },
+                actions: [
+                  () => {
+                    console.log("resume")
+                    workEndTime = dayjs().add(diffTime + 1, "second")
+                  },
+                  () => {
+                    socket.emit("send_twitch_message", {
+                      message: `Pomodoro Resumed`,
+                    })
+                  },
+                ],
               },
             },
           },
@@ -86,9 +103,19 @@
         on: {
           FINISH: {
             target: "break",
+            actions: () => {
+              socket.emit("send_twitch_message", {
+                message: `Pomodoro Done!`,
+              })
+            },
           },
           CANCEL: {
             target: "idle",
+            actions: () => {
+              socket.emit("send_twitch_message", {
+                message: `Pomodoro Canceled.`,
+              })
+            },
           },
         },
       },
@@ -104,12 +131,19 @@
         on: {
           FINISH: {
             target: "idle",
-            actions: () => {
-              alarm.play()
+            actions: [
+              () => {
+                alarm.play()
 
-              const message = "Break Is Over!"
-              axios.get(`/api/notify?message=${message}`)
-            },
+                const message = "Break Is Over!"
+                axios.get(`/api/notify?message=${message}`)
+              },
+              () => {
+                socket.emit("send_twitch_message", {
+                  message: `Pomodoro break is over`,
+                })
+              },
+            ],
           },
         },
       },
@@ -183,8 +217,6 @@
     controls = !!$page.url.searchParams.get("controls")
 
     window["command"] = onCommand
-
-    const socket = io("ws://streamie-socket.narze.live")
 
     socket.on("pomodorov2", ({ args }) => {
       if (args.length == 0) {

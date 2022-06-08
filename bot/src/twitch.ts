@@ -4,12 +4,14 @@ import { createClient } from "redis"
 
 import { ITwitchCommand } from "../types"
 import socket from "./socket-client"
+import { io as socketIo } from "socket.io-client"
 import { onBits, onGiftSub, onSub } from "./twitch/actions"
 import { isAutosayEnabled } from "./twitch-commands/autosay"
 
 const MIN_BITS_TO_PRINT = 10
 
 const io = socket()
+const ioTwitchClient = socketIo(process.env.SOCKET_IO_SERVER_URL!, {}) // Another instance of Socket IO client
 const redisClient = createClient({
   url: process.env.REDIS_URL,
 })
@@ -19,6 +21,16 @@ redisClient.on("error", (err) => console.log("Redis Client Error", err))
 let interval
 
 export default function twitch() {
+  // Send message
+  ioTwitchClient.on("connect", () => {
+    ioTwitchClient.on(
+      "send_twitch_message",
+      async ({ message }: { message: string }) => {
+        await client.say("narzeLIVE", message)
+      }
+    )
+  })
+
   const client = new tmi.Client({
     options: { debug: true, messagesLogLevel: "info" },
     connection: {
