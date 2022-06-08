@@ -23,11 +23,13 @@ const farm: ITwitchCommand = {
       }
     )
 
-    let farmAmount = 1
+    if (streamsRes?.data?.data[0]?.type !== "live") {
+      await client.say(channel, `@${name} ฟาร์มได้เฉพาะตอน Live เท่านั้น`)
 
-    if (streamsRes?.data?.data[0]?.type === "live") {
-      farmAmount = 5 + Math.ceil(Math.random() * 5)
+      return
     }
+
+    let farmAmount = 5 + Math.ceil(Math.random() * 10)
 
     const user = await upsertUser(name, id)
 
