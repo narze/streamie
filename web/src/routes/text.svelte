@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { io } from "socket.io-client"
+
   import { onMount } from "svelte"
 
   export const prerender = false
@@ -8,9 +10,15 @@
 
   let input: HTMLInputElement
 
-  $: text = $svelteStore.data["text"] || "..."
+  $: text = $svelteStore.data["text"] || " "
 
   onMount(() => {
+    const socket = io("ws://streamie-socket.narze.live")
+
+    socket.on("doing", ({ message }) => {
+      $svelteStore.data["text"] = message
+    })
+
     const room = window.location.search
       .slice(1)
       .split("&")
@@ -20,7 +28,7 @@
     console.log({ room })
     connectRoom(room)
 
-    input.focus()
+    // input.focus()
   })
 
   function onType(e) {
@@ -31,7 +39,7 @@
 <main class="w-auto h-screen">
   <input
     type="text"
-    class="w-full h-full text-3xl p-2 text-center border"
+    class="w-full h-full text-2xl p-2 text-center"
     value={text}
     bind:this={input}
     on:keyup={onType}
@@ -41,5 +49,10 @@
 <style>
   :global(html, body) {
     background-color: rgba(0, 0, 0, 0) !important;
+  }
+
+  input {
+    background-color: rgba(0, 0, 0, 0) !important;
+    color: white;
   }
 </style>
