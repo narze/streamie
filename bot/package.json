@@ -14,6 +14,7 @@
     "test": "NODE_ENV=test dotenv-flow -- vitest",
     "dev": "ts-node-dev --exit-child --respawn src",
     "deploy-commands": "ts-node deploy-commands",
+    "twitch-auth": "node retrieve-twitch-oauth-token",
     "prisma": "dotenv-flow -- prisma",
     "postinstall": "prisma generate"
   },

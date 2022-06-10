@@ -13,15 +13,21 @@ const farm: ITwitchCommand = {
     const twitchToken = process.env.TWITCH_HELIX_OAUTH_TOKEN!
     const twitchClientId = process.env.TWITCH_HELIX_CLIENT_ID!
 
-    const streamsRes = await axios.get(
-      "https://api.twitch.tv/helix/streams?user_login=narzelive",
-      {
-        headers: {
-          Authorization: `Bearer ${twitchToken}`,
-          "Client-Id": twitchClientId,
-        },
-      }
-    )
+    let streamsRes
+    try {
+      streamsRes = await axios.get(
+        "https://api.twitch.tv/helix/streams?user_login=narzelive",
+        {
+          headers: {
+            Authorization: `Bearer ${twitchToken}`,
+            "Client-Id": twitchClientId,
+          },
+        }
+      )
+    } catch (e) {
+      console.error(e.message)
+      return
+    }
 
     if (streamsRes?.data?.data[0]?.type !== "live") {
       await client.say(channel, `@${name} ฟาร์มได้เฉพาะตอน Live เท่านั้น`)
