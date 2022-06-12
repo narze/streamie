@@ -37,6 +37,23 @@ export function isThreeOfAKind(cards: Array<ICard>): boolean {
   return cards.length == 3 && cards[0].value == cards[1].value && cards[1].value == cards[2].value
 }
 
+export function isSamLueng(cards: Array<ICard>): boolean {
+  const values = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"]
+  const cardValues = cards.map((card) => values[card.value])
+
+  const lueang = ["J", "Q", "K"]
+
+  if (
+    cardValues.length == 3 &&
+    lueang.includes(cardValues[0]) &&
+    lueang.includes(cardValues[1]) &&
+    lueang.includes(cardValues[2])
+  ) {
+    return true
+  }
+  return false
+}
+
 export function isStraight(values: Array<string>): boolean {
   if (values.length !== 3) {
     return false
@@ -86,10 +103,10 @@ export function cardsToDeng(cards: Array<ICard>): number {
   // สามเหลือง
   const lueang = ["J", "Q", "K"]
   if (
-    cardSuits.length == 3 &&
-    lueang.includes(cardSuits[0]) &&
-    lueang.includes(cardSuits[1]) &&
-    lueang.includes(cardSuits[2])
+    cardValues.length == 3 &&
+    lueang.includes(cardValues[0]) &&
+    lueang.includes(cardValues[1]) &&
+    lueang.includes(cardValues[2])
   ) {
     return 3
   }
@@ -126,6 +143,14 @@ export function calculateResult(dealer: IPlayer, player: IPlayer): number {
 
   if (isThreeOfAKind(dealer.cards) && !isThreeOfAKind(player.cards)) {
     return -player.amount * 5
+  }
+
+  if (!isSamLueng(dealer.cards) && isSamLueng(player.cards)) {
+    return player.amount * 3
+  }
+
+  if (isSamLueng(dealer.cards) && !isSamLueng(player.cards)) {
+    return -player.amount * 3
   }
 
   if (dealerScore == playerScore) {

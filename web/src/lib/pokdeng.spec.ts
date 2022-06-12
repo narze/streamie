@@ -92,6 +92,7 @@ describe("calculateResult", () => {
       expect(calculateResult(dealer, player)).toBe(-30)
     })
   })
+
   describe("Tong (3 of a kind)", () => {
     it("multiplies win with 5 Deng, if player wins", () => {
       const dealer: IPlayer = playerGenerator(0, ["♦6", "♦A"])
@@ -105,6 +106,22 @@ describe("calculateResult", () => {
       const player: IPlayer = playerGenerator(10, ["♦6", "♦A"])
 
       expect(calculateResult(dealer, player)).toBe(-50)
+    })
+  })
+
+  describe("3-Lueng", () => {
+    it("multiplies win with 3 Deng, if player wins", () => {
+      const dealer: IPlayer = playerGenerator(0, ["♦6", "♦A"])
+      const player: IPlayer = playerGenerator(10, ["♣J", "♦J", "♥Q"])
+
+      expect(calculateResult(dealer, player)).toBe(30)
+    })
+
+    it("multiplies lose with 3 Deng, if player loses", () => {
+      const dealer: IPlayer = playerGenerator(0, ["♣J", "♦J", "♥Q"])
+      const player: IPlayer = playerGenerator(10, ["♦6", "♦A"])
+
+      expect(calculateResult(dealer, player)).toBe(-30)
     })
   })
 

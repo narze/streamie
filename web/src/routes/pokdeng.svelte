@@ -2,6 +2,9 @@
   import { io } from "socket.io-client"
   import { onDestroy, onMount } from "svelte"
   import { createMachine, assign } from "xstate"
+  import * as dayjs from "dayjs"
+  import type { Dayjs } from "dayjs"
+
   import { useMachine } from "$lib/useMachine"
   import {
     calculateResult,
@@ -14,10 +17,18 @@
   } from "$lib/pokdeng"
 
   const socket = io("ws://streamie-socket.narze.live")
+  const SECONDS_PER_STATE = 5
+  const DEBUG = false
 
   let command = ""
   let dealer: IPlayer = { name: "Dealer", amount: 0, cards: [] }
   let players: Array<IPlayer> = []
+
+  let gameStartAt: Dayjs | null
+  let gameEndAt: Dayjs | null
+  let gameRestartAt: Dayjs | null
+  let countdownTimer: number
+  let tickInterval
 
   $: playersCanDraw = players.map((_player, idx) => {
     if (!$state.matches("Playing")) {
@@ -34,11 +45,12 @@
     initial: "Waiting",
     states: {
       Waiting: {
-        entry: ["clearPlayers"],
+        entry: ["resetTimers", "clearPlayers"],
 
         on: {
           START: {
             target: "Playing",
+            actions: ["setGameTimer"],
           },
         },
       },
@@ -48,6 +60,7 @@
         on: {
           END: {
             target: "Ending",
+            actions: ["setRestartTimer"],
           },
         },
       },
@@ -65,6 +78,17 @@
 
   const options = {
     actions: {
+      resetTimers: () => {
+        gameStartAt = null
+        gameEndAt = null
+        gameRestartAt = null
+      },
+      setGameTimer: () => {
+        gameEndAt = dayjs().add(SECONDS_PER_STATE, "seconds")
+      },
+      setRestartTimer: () => {
+        gameRestartAt = dayjs().add(10, "seconds")
+      },
       distributeCards: () => {
         cards = shuffle(generateDeck())
         dealer = { ...dealer, cards: [cards.shift(), cards.shift()] }
@@ -127,10 +151,17 @@
         onCommand("draw", args.name)
       }
     })
+
+    clearInterval(tickInterval)
+
+    tickInterval = setInterval(() => {
+      tick()
+    }, 200)
   })
 
   onDestroy(() => {
     socket.off("pokdeng")
+    clearInterval(tickInterval)
   })
 
   function drawCard(name: string) {
@@ -191,6 +222,36 @@
       players[playerIndex] = { name, amount, cards: [] }
       players = players
     }
+
+    // Start timer when at least one player joins
+    if (players.length == 1) {
+      gameStartAt = dayjs().add(SECONDS_PER_STATE, "second")
+    }
+  }
+
+  function tick() {
+    if ($state.matches("Waiting")) {
+      countdownTimer = gameStartAt?.diff(new Date(), "second")
+
+      if (countdownTimer < 0) {
+        countdownTimer = 0
+        send("START")
+      }
+    } else if ($state.matches("Playing")) {
+      countdownTimer = gameEndAt?.diff(new Date(), "second")
+
+      if (countdownTimer < 0) {
+        countdownTimer = 0
+        send("END")
+      }
+    } else if ($state.matches("Ending")) {
+      countdownTimer = gameRestartAt?.diff(new Date(), "second")
+
+      if (countdownTimer < 0) {
+        countdownTimer = 0
+        send("RESTART")
+      }
+    }
   }
 
   function generateDeck() {
@@ -247,7 +308,7 @@
         <div class="flex-1">Score: {cardsToScore(dealer.cards)}</div>
         <div class="flex-1">ป๊อก: {isPok(dealer.cards)}</div>
         <div class="flex-1">เด้ง: {cardsToDeng(dealer.cards)}</div>
-        {#if dealerCanDraw}
+        {#if DEBUG && dealerCanDraw}
           <button class="btn btn-primary" on:click={() => dealerDrawCard()}> จั่วเพิ่ม </button>
         {/if}
       {:else}
@@ -265,10 +326,12 @@
         <div class="flex-1">Score: {cardsToScore(cards)}</div>
         <div class="flex-1">ป๊อก: {isPok(cards)}</div>
         <div class="flex-1">เด้ง: {cardsToDeng(cards)}</div>
-        {#if playersCanDraw[idx]}
+        {#if DEBUG && playersCanDraw[idx]}
           <button class="btn btn-primary" on:click={() => drawCard(name)}> จั่วเพิ่ม </button>
         {/if}
-        <div class="flex-1">Result: {resultAmount}</div>
+        {#if resultAmount != undefined}
+          <div class="flex-1">Result: {resultAmount}</div>
+        {/if}
       </div>
     {/each}
   </div>
@@ -277,11 +340,28 @@
     State: {$state.value}
 
     {#if $state.matches("Waiting")}
-      <button class="btn btn-primary" on:click={() => send("START")}> Start </button>
+      {#if countdownTimer}
+        <div>
+          Game will start in {countdownTimer} seconds
+        </div>
+      {/if}
+      {#if DEBUG}
+        <button class="btn btn-primary" on:click={() => send("START")}> Start </button>
+      {/if}
     {:else if $state.matches("Playing")}
-      <button class="btn btn-primary" on:click={() => send("END")}> End </button>
+      <div>
+        Game will end in {countdownTimer} seconds
+      </div>
+      {#if DEBUG}
+        <button class="btn btn-primary" on:click={() => send("END")}> End </button>
+      {/if}
     {:else if $state.matches("Ending")}
-      <button class="btn btn-primary" on:click={() => send("RESTART")}> Restart </button>
+      <div>
+        Game will restart in {countdownTimer} seconds
+      </div>
+      {#if DEBUG}
+        <button class="btn btn-primary" on:click={() => send("RESTART")}> Restart </button>
+      {/if}
     {/if}
   </section>
 
