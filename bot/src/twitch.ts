@@ -7,6 +7,7 @@ import socket from "./socket-client"
 import { io as socketIo } from "socket.io-client"
 import { onBits, onGiftSub, onSub } from "./twitch/actions"
 import { isAutosayEnabled } from "./twitch-commands/autosay"
+import prisma from "./prisma"
 
 const MIN_BITS_TO_PRINT = 10
 
@@ -20,13 +21,35 @@ redisClient.on("error", (err) => console.log("Redis Client Error", err))
 
 let interval
 
+export interface IPokdengResult {
+  name: string
+  resultAmount: number
+}
+
 export default function twitch() {
-  // Send message
   ioTwitchClient.on("connect", () => {
+    // Send message
     ioTwitchClient.on(
       "send_twitch_message",
       async ({ message }: { message: string }) => {
         await client.say("narzeLIVE", message)
+      }
+    )
+
+    // Pokdeng payout
+    ioTwitchClient.on(
+      "pokdeng_payout",
+      async ({ players }: { players: Array<IPokdengResult> }) => {
+        players.forEach(async (player) => {
+          if (player.resultAmount == 0) {
+            return
+          }
+
+          await prisma.user.update({
+            where: { name: player.name.toLowerCase() },
+            data: { coin: { increment: player.resultAmount } },
+          })
+        })
       }
     )
   })

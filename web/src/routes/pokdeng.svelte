@@ -16,12 +16,12 @@
   } from "$lib/pokdeng"
   import PokdengPlayer from "$lib/components/PokdengPlayer.svelte"
 
-  const SECONDS_PER_STATE = 10
+  const SECONDS_PER_STATE = 30
   const DEBUG = false
 
   const socket = io("ws://streamie-socket.narze.live")
 
-  let command = ""
+  // let command = ""
   let dealer: IPlayer = { name: "เจ้ามือ", amount: 0, cards: [] }
   let players: Array<IPlayer> = []
 
@@ -31,12 +31,12 @@
   let countdownTimer: number
   let tickInterval
 
-  $: playersCanDraw = players.map((_player, idx) => {
-    if (!$state.matches("Playing")) {
-      return false
-    }
-    return canDraw(idx)
-  })
+  // $: playersCanDraw = players.map((_player, idx) => {
+  //   if (!$state.matches("Playing")) {
+  //     return false
+  //   }
+  //   return canDraw(idx)
+  // })
   $: dealerCanDraw = $state.matches("Playing") && dealer.cards.length < 3 && !isPok(dealer.cards)
 
   let cards = shuffle(generateDeck())
@@ -56,7 +56,7 @@
         },
       },
       Playing: {
-        entry: ["distributeCards"],
+        entry: ["distributeCards", "checkIfDealerPok"],
 
         on: {
           END: {
@@ -102,14 +102,40 @@
 
         cards = cards
       },
+      checkIfDealerPok: () => {
+        if (isPok(dealer.cards)) {
+          socket.emit("send_twitch_message", {
+            message: "เจ้ามือป๊อก! แดกรอบวง!",
+          })
+
+          send("END")
+        }
+      },
       clearPlayers: () => {
         players = []
         dealer = { ...dealer, cards: [] }
       },
-      calculateAndPayout: () => {
+      calculateAndPayout: async () => {
         players = players.map((player) => {
           const resultAmount = calculateResult(dealer, player)
           return { ...player, resultAmount }
+        })
+
+        const messages = players.map(
+          (player) =>
+            `@${player.name}: ${
+              player.resultAmount > 0 ? `+${player.resultAmount}` : player.resultAmount
+            }`
+        )
+
+        setTimeout(() => {
+          socket.emit("send_twitch_message", {
+            message: "ผลป๊อกเด้ง: " + messages.join(" | "),
+          })
+        }, 1500)
+
+        await socket.emit("pokdeng_payout", {
+          players,
         })
       },
     },
@@ -132,11 +158,17 @@
   onMount(() => {
     window["command"] = onCommand
 
-    socket.on("pokdeng", (args: IPokdengCommand) => {
+    socket.on("pokdeng", async (args: IPokdengCommand) => {
       if (args.command == "join") {
         const amount = args.amount!
 
         onCommand("join", args.name, [amount])
+
+        if ($state.matches("Playing")) {
+          await socket.emit("send_twitch_message", {
+            message: `@${args.name} รอตาหน้านะจ๊ะ`,
+          })
+        }
       }
 
       if (args.command == "draw") {
@@ -185,26 +217,30 @@
     }
   }
 
-  function canDraw(playerId) {
-    if (!$state.matches("Playing")) {
-      return false
-    }
+  // function canDraw(playerId) {
+  //   if (!$state.matches("Playing")) {
+  //     return false
+  //   }
 
-    const player = players[playerId]
-    if (player.cards.length < 3 && !isPok(player.cards)) {
-      return true
-    }
-    return false
-  }
+  //   const player = players[playerId]
+  //   if (player.cards.length < 3 && !isPok(player.cards)) {
+  //     return true
+  //   }
+  //   return false
+  // }
 
-  function sendCommand(e) {
-    if (e.key === "Enter") {
-      onCommand(command, "narze-test")
-      command = ""
-    }
-  }
+  // function sendCommand(e) {
+  //   if (e.key === "Enter") {
+  //     onCommand(command, "narze-test")
+  //     command = ""
+  //   }
+  // }
 
   function addPlayer(name, amount) {
+    if (players.length >= 16) {
+      return
+    }
+
     // Update player if already exists
     const playerIndex = players.findIndex((player) => player.name == name)
 
@@ -261,13 +297,6 @@
     return deck
   }
 
-  function cardToString(suit: number, value: number) {
-    const suits = ["♠", "♥", "♣", "♦"]
-    const values = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"]
-
-    return `${suits[suit]}${values[value]}`
-  }
-
   function shuffle<T>(deck: Array<T>) {
     const shuffled = []
 
@@ -280,7 +309,7 @@
   }
 </script>
 
-<main class="p-4 min-h-screen w-full flex flex-col items-center justify-center gap-4">
+<main class="font-sans p-4 min-h-screen w-full flex flex-col items-center justify-center gap-4">
   <h1 class="text-3xl text-black">ป๊อกเด้ง</h1>
 
   <!-- <input
@@ -292,7 +321,9 @@
 
   <div class="flex flex-col gap-4 container mx-auto">
     <div class="flex gap-2">
-      <PokdengPlayer player={dealer} isDealer={true} gameState={`${$state.value}`} />
+      {#if players.length > 0}
+        <PokdengPlayer player={dealer} isDealer={true} gameState={`${$state.value}`} />
+      {/if}
       {#each players as player}
         <PokdengPlayer {player} gameState={`${$state.value}`} />
         <!-- <div class="flex items-center">
@@ -319,7 +350,7 @@
     {/if}
   </div>
 
-  <section class="p-4 flex flex-col gap-2 border rounded items-center">
+  <section class="p-2 flex flex-col gap-2 border rounded items-center">
     {#if DEBUG}
       State: {$state.value}
     {/if}
