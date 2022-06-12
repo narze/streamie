@@ -1,7 +1,7 @@
 <script lang="ts">
   import { io } from "socket.io-client"
   import { onDestroy, onMount } from "svelte"
-  import { createMachine, assign } from "xstate"
+  import { createMachine } from "xstate"
   import * as dayjs from "dayjs"
   import type { Dayjs } from "dayjs"
 
@@ -11,17 +11,18 @@
     cardsToDeng,
     cardsToScore,
     isPok,
-    type ICard,
     type IPlayer,
     type IPokdengCommand,
   } from "$lib/pokdeng"
+  import PokdengPlayer from "$lib/components/PokdengPlayer.svelte"
 
-  const socket = io("ws://streamie-socket.narze.live")
-  const SECONDS_PER_STATE = 5
+  const SECONDS_PER_STATE = 10
   const DEBUG = false
 
+  const socket = io("ws://streamie-socket.narze.live")
+
   let command = ""
-  let dealer: IPlayer = { name: "Dealer", amount: 0, cards: [] }
+  let dealer: IPlayer = { name: "เจ้ามือ", amount: 0, cards: [] }
   let players: Array<IPlayer> = []
 
   let gameStartAt: Dayjs | null
@@ -111,21 +112,12 @@
           return { ...player, resultAmount }
         })
       },
-      // startTickInterval,
-      // stopTickInterval,
-      // setWorkEndTime: () => {
-      //   // console.log({ workEndTime })
-      //   workEndTime = dayjs().add(workTimer, "second")
-      //   tick()
-      // },
     },
   }
   const toggleMachine = createMachine(machineData, options)
   const { state, send } = useMachine(toggleMachine)
 
   function onCommand(command: string, name: string, args?: Array<string | number>) {
-    console.log({ command, args })
-
     if (command == "join" && $state.matches("Waiting")) {
       const amount = +args[0] || 1
 
@@ -299,66 +291,71 @@
   /> -->
 
   <div class="flex flex-col gap-4 container mx-auto">
-    <div class="flex items-center">
-      <div class="flex-1">{dealer.name}</div>
-      {#if $state.matches("Ending")}
-        <div class="flex-1">
-          {dealer.cards.map((card) => cardToString(card.suit, card.value)).join(", ")}
-        </div>
-        <div class="flex-1">Score: {cardsToScore(dealer.cards)}</div>
-        <div class="flex-1">ป๊อก: {isPok(dealer.cards)}</div>
-        <div class="flex-1">เด้ง: {cardsToDeng(dealer.cards)}</div>
-        {#if DEBUG && dealerCanDraw}
-          <button class="btn btn-primary" on:click={() => dealerDrawCard()}> จั่วเพิ่ม </button>
-        {/if}
-      {:else}
-        ****
-      {/if}
+    <div class="flex gap-2">
+      <PokdengPlayer player={dealer} isDealer={true} gameState={`${$state.value}`} />
+      {#each players as player}
+        <PokdengPlayer {player} gameState={`${$state.value}`} />
+        <!-- <div class="flex items-center">
+          <div class="flex-1">{name}</div>
+          <div class="flex-1">{amount}</div>
+          <div class="flex-1">
+            {cards.map((card) => cardToString(card.suit, card.value)).join(", ")}
+          </div>
+          <div class="flex-1">Score: {cardsToScore(cards)}</div>
+          <div class="flex-1">ป๊อก: {isPok(cards)}</div>
+          <div class="flex-1">เด้ง: {cardsToDeng(cards)}</div>
+          {#if DEBUG && playersCanDraw[idx]}
+            <button class="btn btn-primary" on:click={() => drawCard(name)}> จั่วเพิ่ม </button>
+          {/if}
+          {#if resultAmount != undefined}
+            <div class="flex-1">Result: {resultAmount}</div>
+          {/if}
+        </div> -->
+      {/each}
     </div>
 
-    {#each players as { name, amount, cards, resultAmount }, idx}
-      <div class="flex items-center">
-        <div class="flex-1">{name}</div>
-        <div class="flex-1">{amount}</div>
-        <div class="flex-1">
-          {cards.map((card) => cardToString(card.suit, card.value)).join(", ")}
-        </div>
-        <div class="flex-1">Score: {cardsToScore(cards)}</div>
-        <div class="flex-1">ป๊อก: {isPok(cards)}</div>
-        <div class="flex-1">เด้ง: {cardsToDeng(cards)}</div>
-        {#if DEBUG && playersCanDraw[idx]}
-          <button class="btn btn-primary" on:click={() => drawCard(name)}> จั่วเพิ่ม </button>
-        {/if}
-        {#if resultAmount != undefined}
-          <div class="flex-1">Result: {resultAmount}</div>
-        {/if}
-      </div>
-    {/each}
+    {#if DEBUG && dealerCanDraw}
+      <button class="btn btn-primary" on:click={() => dealerDrawCard()}> จั่วเพิ่ม </button>
+    {/if}
   </div>
 
-  <section class="p-4 flex flex-col gap-2 border rounded">
-    State: {$state.value}
+  <section class="p-4 flex flex-col gap-2 border rounded items-center">
+    {#if DEBUG}
+      State: {$state.value}
+    {/if}
 
     {#if $state.matches("Waiting")}
-      {#if countdownTimer}
+      <p>
+        พิมพ์ <code class="bg-slate-500 rounded p-1">!pok join [จำนวนเงิน]</code>
+        เพื่อเข้าร่วม
+      </p>
+      {#if countdownTimer != undefined}
         <div>
-          Game will start in {countdownTimer} seconds
+          เริ่มใน {countdownTimer} วินาที
         </div>
       {/if}
       {#if DEBUG}
         <button class="btn btn-primary" on:click={() => send("START")}> Start </button>
       {/if}
     {:else if $state.matches("Playing")}
-      <div>
-        Game will end in {countdownTimer} seconds
-      </div>
+      <p>
+        พิมพ์ <code class="bg-slate-500 rounded p-1">!pok draw</code>
+        เพื่อจั่วเพิ่ม
+      </p>
+      {#if countdownTimer != undefined}
+        <div>
+          เกมจบใน {countdownTimer} วินาที
+        </div>
+      {/if}
       {#if DEBUG}
         <button class="btn btn-primary" on:click={() => send("END")}> End </button>
       {/if}
     {:else if $state.matches("Ending")}
-      <div>
-        Game will restart in {countdownTimer} seconds
-      </div>
+      {#if countdownTimer != undefined}
+        <div>
+          เริ่มใหม่ใน {countdownTimer} วินาที
+        </div>
+      {/if}
       {#if DEBUG}
         <button class="btn btn-primary" on:click={() => send("RESTART")}> Restart </button>
       {/if}
