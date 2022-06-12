@@ -4,6 +4,7 @@
   import { createMachine } from "xstate"
   import * as dayjs from "dayjs"
   import type { Dayjs } from "dayjs"
+  import { fly } from "svelte/transition"
 
   import { useMachine } from "$lib/useMachine"
   import {
@@ -309,8 +310,8 @@
   }
 </script>
 
-<main class="font-sans p-4 min-h-screen w-full flex flex-col items-center justify-center gap-4">
-  <h1 class="text-3xl text-black">ป๊อกเด้ง</h1>
+<main class="font-sans p-2 min-h-screen w-full flex flex-col items-start gap-2">
+  <!-- <h1 class="text-3xl text-black">ป๊อกเด้ง</h1> -->
 
   <!-- <input
     bind:value={command}
@@ -319,7 +320,49 @@
     on:keydown={sendCommand}
   /> -->
 
-  <div class="flex flex-col gap-4 container mx-auto">
+  <section class="p-2 flex flex-col gap-2 border-2 border-white rounded items-center">
+    {#if DEBUG}
+      State: {$state.value}
+    {/if}
+
+    {#if $state.matches("Waiting")}
+      <p in:fly={{ y: 300 }} class="text-sm">
+        [ป๊อกเด้ง] พิมพ์ <code class="bg-slate-500 text-white rounded p-1"
+          >!pok join [จำนวนเงิน]</code
+        >
+        เพื่อเข้าร่วม
+      </p>
+      {#if countdownTimer != undefined}
+        <div class="text-sm">
+          เริ่มใน {countdownTimer} วินาที
+        </div>
+      {/if}
+      {#if DEBUG}
+        <button class="btn btn-primary" on:click={() => send("START")}> Start </button>
+      {/if}
+    {:else if $state.matches("Playing")}
+      <p>
+        พิมพ์ <code class="bg-slate-500 text-white rounded p-1">!pok draw</code>
+        เพื่อจั่วเพิ่ม
+        {#if countdownTimer != undefined}
+          <span>(นับแต้มใน {countdownTimer} วินาที)</span>
+        {/if}
+      </p>
+      {#if DEBUG}
+        <button class="btn btn-primary" on:click={() => send("END")}> End </button>
+      {/if}
+    {:else if $state.matches("Ending")}
+      {#if countdownTimer != undefined}
+        <div>
+          เริ่มใหม่ใน {countdownTimer} วินาที
+        </div>
+      {/if}
+      {#if DEBUG}
+        <button class="btn btn-primary" on:click={() => send("RESTART")}> Restart </button>
+      {/if}
+    {/if}
+  </section>
+  <div class="flex flex-col gap-4">
     <div class="flex gap-2">
       {#if players.length > 0}
         <PokdengPlayer player={dealer} isDealer={true} gameState={`${$state.value}`} />
@@ -349,49 +392,6 @@
       <button class="btn btn-primary" on:click={() => dealerDrawCard()}> จั่วเพิ่ม </button>
     {/if}
   </div>
-
-  <section class="p-2 flex flex-col gap-2 border rounded items-center">
-    {#if DEBUG}
-      State: {$state.value}
-    {/if}
-
-    {#if $state.matches("Waiting")}
-      <p>
-        พิมพ์ <code class="bg-slate-500 rounded p-1">!pok join [จำนวนเงิน]</code>
-        เพื่อเข้าร่วม
-      </p>
-      {#if countdownTimer != undefined}
-        <div>
-          เริ่มใน {countdownTimer} วินาที
-        </div>
-      {/if}
-      {#if DEBUG}
-        <button class="btn btn-primary" on:click={() => send("START")}> Start </button>
-      {/if}
-    {:else if $state.matches("Playing")}
-      <p>
-        พิมพ์ <code class="bg-slate-500 rounded p-1">!pok draw</code>
-        เพื่อจั่วเพิ่ม
-      </p>
-      {#if countdownTimer != undefined}
-        <div>
-          เกมจบใน {countdownTimer} วินาที
-        </div>
-      {/if}
-      {#if DEBUG}
-        <button class="btn btn-primary" on:click={() => send("END")}> End </button>
-      {/if}
-    {:else if $state.matches("Ending")}
-      {#if countdownTimer != undefined}
-        <div>
-          เริ่มใหม่ใน {countdownTimer} วินาที
-        </div>
-      {/if}
-      {#if DEBUG}
-        <button class="btn btn-primary" on:click={() => send("RESTART")}> Restart </button>
-      {/if}
-    {/if}
-  </section>
 
   <!-- <div class="grid grid-cols-8 gap-2 items-center">
     {#each cards as card}

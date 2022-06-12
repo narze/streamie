@@ -40,7 +40,7 @@
 
 <div
   in:fly={{ x: 300, duration: 800 }}
-  class="flex flex-col border rounded px-2 py-1 gap-2 min-w-fit max-w-xs items-center"
+  class="flex flex-col border-2 rounded px-2 py-1 gap-2 min-w-fit max-w-xs items-center"
 >
   <div class="flex gap-2 justify-center">
     <span>
@@ -52,7 +52,7 @@
         {#each player.cards as card, idx}
           <span
             in:fly={{ y: 300, delay: idx * 300 }}
-            class="text-gray-800 rounded border px-1 border-black"
+            class="text-gray-800 bg-white rounded px-1"
           >
             {#if isDealer && gameState === "Playing"}
               ??
