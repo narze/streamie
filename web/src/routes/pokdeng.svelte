@@ -1,40 +1,23 @@
 <script lang="ts">
   import { io } from "socket.io-client"
-  import { onMount } from "svelte"
+  import { onDestroy, onMount } from "svelte"
   import { createMachine, assign } from "xstate"
   import { useMachine } from "$lib/useMachine"
+  import {
+    calculateResult,
+    cardsToDeng,
+    cardsToScore,
+    isPok,
+    type ICard,
+    type IPlayer,
+    type IPokdengCommand,
+  } from "$lib/pokdeng"
 
-  // const socket = io("ws://streamie-socket.narze.live")
-  interface IPlayer {
-    name: string
-    amount: number
-    cards: Array<ICard>
-  }
-
-  interface ICard {
-    suit: number
-    value: number
-  }
+  const socket = io("ws://streamie-socket.narze.live")
 
   let command = ""
   let dealer: IPlayer = { name: "Dealer", amount: 0, cards: [] }
-  let players: Array<IPlayer> = [
-    {
-      name: "narze-7zcawjpdt83",
-      amount: 20,
-      cards: [],
-    },
-    {
-      name: "narze-mjjz3sj65g",
-      amount: 30,
-      cards: [],
-    },
-    {
-      name: "narze-je23l2jgd7",
-      amount: 40,
-      cards: [],
-    },
-  ]
+  let players: Array<IPlayer> = []
 
   $: playersCanDraw = players.map((_player, idx) => {
     if (!$state.matches("Playing")) {
@@ -51,7 +34,7 @@
     initial: "Waiting",
     states: {
       Waiting: {
-        entry: [],
+        entry: ["clearPlayers"],
 
         on: {
           START: {
@@ -69,6 +52,8 @@
         },
       },
       Ending: {
+        entry: ["calculateAndPayout"],
+
         on: {
           RESTART: {
             target: "Waiting",
@@ -92,6 +77,16 @@
 
         cards = cards
       },
+      clearPlayers: () => {
+        players = []
+        dealer = { ...dealer, cards: [] }
+      },
+      calculateAndPayout: () => {
+        players = players.map((player) => {
+          const resultAmount = calculateResult(dealer, player)
+          return { ...player, resultAmount }
+        })
+      },
       // startTickInterval,
       // stopTickInterval,
       // setWorkEndTime: () => {
@@ -104,34 +99,51 @@
   const toggleMachine = createMachine(machineData, options)
   const { state, send } = useMachine(toggleMachine)
 
-  function onCommand(command: string) {
-    const [commandName, ...args] = command.split(" ")
+  function onCommand(command: string, name: string, args?: Array<string | number>) {
+    console.log({ command, args })
 
-    console.log({ commandName, args })
-
-    if (commandName == "join" && $state.matches("Waiting")) {
+    if (command == "join" && $state.matches("Waiting")) {
       const amount = +args[0] || 1
-      const name = "narze-" + Math.random().toString(36).substring(2, 15)
 
       addPlayer(name, amount)
     }
 
-    if (commandName == "draw" && $state.matches("Playing")) {
-      const playerId = ~~(Math.random() * players.length)
-
-      drawCard(playerId)
+    if (command == "draw" && $state.matches("Playing")) {
+      drawCard(name)
     }
   }
 
   onMount(() => {
     window["command"] = onCommand
+
+    socket.on("pokdeng", (args: IPokdengCommand) => {
+      if (args.command == "join") {
+        const amount = args.amount!
+
+        onCommand("join", args.name, [amount])
+      }
+
+      if (args.command == "draw") {
+        onCommand("draw", args.name)
+      }
+    })
   })
 
-  function drawCard(playerId: number) {
-    if (players[playerId].cards.length < 3) {
-      players[playerId] = {
-        ...players[playerId],
-        cards: [...players[playerId].cards, cards.shift()],
+  onDestroy(() => {
+    socket.off("pokdeng")
+  })
+
+  function drawCard(name: string) {
+    const playerIndex = players.findIndex((player) => player.name == name)
+
+    if (playerIndex == -1) {
+      return
+    }
+
+    if (players[playerIndex].cards.length < 3) {
+      players[playerIndex] = {
+        ...players[playerIndex],
+        cards: [...players[playerIndex].cards, cards.shift()],
       }
 
       cards = cards
@@ -164,13 +176,21 @@
 
   function sendCommand(e) {
     if (e.key === "Enter") {
-      onCommand(command)
+      onCommand(command, "narze-test")
       command = ""
     }
   }
 
   function addPlayer(name, amount) {
-    players = [...players, { name, amount, cards: [] }]
+    // Update player if already exists
+    const playerIndex = players.findIndex((player) => player.name == name)
+
+    if (playerIndex == -1) {
+      players = [...players, { name, amount, cards: [] }]
+    } else {
+      players[playerIndex] = { name, amount, cards: [] }
+      players = players
+    }
   }
 
   function generateDeck() {
@@ -205,84 +225,37 @@
 
     return shuffled
   }
-
-  function cardsToScore(cards: Array<ICard>) {
-    return (
-      cards
-        .map((card) => {
-          const scoreValues = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10]
-
-          return scoreValues[card.value]
-        })
-        .reduce((prev, curr) => prev + curr, 0) % 10
-    )
-  }
-
-  function isPok(cards: Array<ICard>): boolean {
-    const score = cardsToScore(cards)
-    return cards.length == 2 && (score == 8 || score == 9)
-  }
-
-  function cardsToDeng(cards: Array<ICard>): number {
-    const suitValues = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"]
-    const suits = cards.map((card) => suitValues[card.suit])
-
-    // สองเด้ง
-    if (suits.length == 2 && (suits[0] == suits[1] || cards[0].value == cards[1].value)) {
-      return 2
-    }
-
-    // ตอง (ห้าเด้ง)
-    if (suits.length == 3 && cards[0].value == cards[1].value && cards[1].value == cards[2].value) {
-      return 5
-    }
-
-    // สามเด้ง
-    if (suits.length == 3 && suits[0] == suits[1] && suits[1] == suits[2]) {
-      return 3
-    }
-
-    // สามเหลือง
-    const lueang = ["J", "Q", "K"]
-    if (
-      suits.length == 3 &&
-      lueang.includes(suits[0]) &&
-      lueang.includes(suits[1]) &&
-      lueang.includes(suits[2])
-    ) {
-      return 3
-    }
-
-    return 1
-  }
 </script>
 
 <main class="p-4 min-h-screen w-full flex flex-col items-center justify-center gap-4">
-  <h1 class="text-3xl text-black">ป๊อกเด้ง on Twitch</h1>
+  <h1 class="text-3xl text-black">ป๊อกเด้ง</h1>
 
-  <input
+  <!-- <input
     bind:value={command}
     type="text"
     class="input bg-gray-400 text-black"
     on:keydown={sendCommand}
-  />
+  /> -->
 
   <div class="flex flex-col gap-4 container mx-auto">
     <div class="flex items-center">
       <div class="flex-1">{dealer.name}</div>
-      <div class="flex-1">{dealer.amount}</div>
-      <div class="flex-1">
-        {dealer.cards.map((card) => cardToString(card.suit, card.value)).join(", ")}
-      </div>
-      <div class="flex-1">Score: {cardsToScore(dealer.cards)}</div>
-      <div class="flex-1">ป๊อก: {isPok(dealer.cards)}</div>
-      <div class="flex-1">เด้ง: {cardsToDeng(dealer.cards)}</div>
-      {#if dealerCanDraw}
-        <button class="btn btn-primary" on:click={() => dealerDrawCard()}> จั่วเพิ่ม </button>
+      {#if $state.matches("Ending")}
+        <div class="flex-1">
+          {dealer.cards.map((card) => cardToString(card.suit, card.value)).join(", ")}
+        </div>
+        <div class="flex-1">Score: {cardsToScore(dealer.cards)}</div>
+        <div class="flex-1">ป๊อก: {isPok(dealer.cards)}</div>
+        <div class="flex-1">เด้ง: {cardsToDeng(dealer.cards)}</div>
+        {#if dealerCanDraw}
+          <button class="btn btn-primary" on:click={() => dealerDrawCard()}> จั่วเพิ่ม </button>
+        {/if}
+      {:else}
+        ****
       {/if}
     </div>
 
-    {#each players as { name, amount, cards }, idx}
+    {#each players as { name, amount, cards, resultAmount }, idx}
       <div class="flex items-center">
         <div class="flex-1">{name}</div>
         <div class="flex-1">{amount}</div>
@@ -293,8 +266,9 @@
         <div class="flex-1">ป๊อก: {isPok(cards)}</div>
         <div class="flex-1">เด้ง: {cardsToDeng(cards)}</div>
         {#if playersCanDraw[idx]}
-          <button class="btn btn-primary" on:click={() => drawCard(idx)}> จั่วเพิ่ม </button>
+          <button class="btn btn-primary" on:click={() => drawCard(name)}> จั่วเพิ่ม </button>
         {/if}
+        <div class="flex-1">Result: {resultAmount}</div>
       </div>
     {/each}
   </div>
@@ -317,5 +291,5 @@
     {/each}
   </div> -->
 
-  Cards left in deck: {cards.length}
+  <!-- Cards left in deck: {cards.length} -->
 </main>
