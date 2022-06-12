@@ -3,7 +3,7 @@
   import { io } from "socket.io-client"
   import { Howl } from "howler"
   import { page } from "$app/stores"
-  import * as dayjs from "dayjs"
+  import dayjs from "dayjs"
   import { createMachine, assign } from "xstate"
   import { useMachine } from "$lib/useMachine"
   import axios from "axios"

@@ -2,7 +2,7 @@
   import { io } from "socket.io-client"
   import { onDestroy, onMount } from "svelte"
   import { createMachine } from "xstate"
-  import * as dayjs from "dayjs"
+  import dayjs from "dayjs"
   import type { Dayjs } from "dayjs"
   import { fly } from "svelte/transition"
 
