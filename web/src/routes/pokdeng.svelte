@@ -134,6 +134,8 @@
             })`
         )
 
+        messages.push(`เจ้ามือ: ${handResult(dealer)}`)
+
         setTimeout(() => {
           socket.emit("send_twitch_message", {
             message: `${debug ? "[DEBUG] " : ""}ผลป๊อกเด้ง: ${messages.join(" | ")}`,
