@@ -19,8 +19,11 @@
   </span>
   {#if player.cards.length}
     <div class="flex gap-1">
-      {#each player.cards as card, idx}
-        <span in:fly={{ y: 300, delay: idx * 300 }} class="bg-white rounded px-1">
+      {#each player.cards as card, idx (idx)}
+        <span
+          in:fly|local={{ y: 300, delay: idx < 2 ? idx * 300 : 0 }}
+          class="bg-white rounded px-1"
+        >
           {#if isDealer && gameState === "Playing"}
             <span class="text-black">??</span>
           {:else}
@@ -36,12 +39,16 @@
   {#if isDealer}
     {#if gameState == "Ending"}
       <div class="flex gap-1">
-        <span class="">{handResult(player)}</span>
+        {#key player.cards.length}
+          <span in:fly={{ y: 300, delay: 200 }}>{handResult(player)}</span>
+        {/key}
       </div>
     {/if}
   {:else if gameState != "Waiting"}
     <div class="flex gap-1">
-      <span class="">{handResult(player)}</span>
+      {#key player.cards.length}
+        <span in:fly={{ y: 300, delay: 200 }}>{handResult(player)}</span>
+      {/key}
       {#if gameState == "Ending"}
         <span class="">
           ({player.resultAmount > 0 ? `+${player.resultAmount}` : player.resultAmount})

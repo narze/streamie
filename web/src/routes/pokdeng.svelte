@@ -19,7 +19,8 @@
   import PokdengPlayer from "$lib/components/PokdengPlayer.svelte"
   import { page } from "$app/stores"
 
-  const SECONDS_PER_STATE = 30
+  let debug: boolean
+  $: SECONDS_PER_STATE = debug ? 5 : 30
   const DEBUG = false
 
   const socket = io("ws://streamie-socket.narze.live")
@@ -33,7 +34,6 @@
   let gameRestartAt: Dayjs | null
   let countdownTimer: number
   let tickInterval
-  let debug: boolean
   let _refs = []
   let playerCardsContainer: HTMLElement
   $: refs = _refs.filter(Boolean)
@@ -64,7 +64,12 @@
         },
       },
       Playing: {
-        entry: ["distributeCards", "checkIfDealerPok", "scrollThroughPlayers"],
+        entry: [
+          "distributeCards",
+          "checkIfDealerPok",
+          "scrollThroughPlayers",
+          "dealerShouldDrawCard",
+        ],
 
         on: {
           END: {
@@ -96,7 +101,7 @@
         gameEndAt = dayjs().add(SECONDS_PER_STATE, "seconds")
       },
       setRestartTimer: () => {
-        gameRestartAt = dayjs().add(10, "seconds")
+        gameRestartAt = dayjs().add(SECONDS_PER_STATE / 3, "seconds")
       },
       distributeCards: () => {
         cards = shuffle(generateDeck())
@@ -137,6 +142,18 @@
           }, 4500)
 
           send("END")
+        }
+      },
+      dealerShouldDrawCard: () => {
+        const dealerScore = cardsToScore(dealer.cards)
+        const drawProb = (10 - dealerScore) / 10
+        if (Math.random() < drawProb) {
+          console.log("Dealer draw a card", { dealerScore, drawProb })
+          setTimeout(() => {
+            dealerDrawCard()
+          }, (SECONDS_PER_STATE / 2) * 1000)
+        } else {
+          console.log("Dealer don't draw more", { dealerScore, drawProb })
         }
       },
       clearPlayers: () => {
@@ -180,6 +197,13 @@
       const amount = +args[0] || 1
 
       addPlayer(name, amount)
+      // addPlayer(name + 1, amount)
+      // addPlayer(name + 2, amount)
+      // addPlayer(name + 3, amount)
+      // addPlayer(name + 4, amount)
+      // addPlayer(name + 5, amount)
+      // addPlayer(name + 6, amount)
+      // addPlayer(name + 7, amount)
     }
 
     if (command == "draw" && $state.matches("Playing")) {
@@ -405,7 +429,7 @@
       {#if players.length > 0}
         <PokdengPlayer player={dealer} isDealer={true} gameState={`${$state.value}`} />
       {/if}
-      {#each players as player, idx}
+      {#each players as player, idx (idx)}
         <PokdengPlayer {player} gameState={`${$state.value}`} bind:el={_refs[idx]} />
         <!-- <div class="flex items-center">
           <div class="flex-1">{name}</div>
