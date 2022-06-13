@@ -8,8 +8,12 @@ const pokdeng: ITwitchCommand = {
 
     const [_, subcommand, ...args] = message.split(/\s+/)
 
-    if (subcommand == "join" || String(subcommand).match(/^[0-9]+$/)) {
-      if (subcommand.match(/^[0-9]+$/)) {
+    if (
+      !subcommand ||
+      subcommand == "join" ||
+      String(subcommand).match(/^[0-9]+$/)
+    ) {
+      if (`${subcommand}`.match(/^[0-9]+$/)) {
         args[0] = subcommand
       }
 
