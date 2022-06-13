@@ -34,6 +34,10 @@
   let countdownTimer: number
   let tickInterval
   let debug: boolean
+  let _refs = []
+  let playerCardsContainer: HTMLElement
+  $: refs = _refs.filter(Boolean)
+  let playerElementFocusIndex
 
   // $: playersCanDraw = players.map((_player, idx) => {
   //   if (!$state.matches("Playing")) {
@@ -60,7 +64,7 @@
         },
       },
       Playing: {
-        entry: ["distributeCards", "checkIfDealerPok"],
+        entry: ["distributeCards", "checkIfDealerPok", "scrollThroughPlayers"],
 
         on: {
           END: {
@@ -106,13 +110,31 @@
 
         cards = cards
       },
+      scrollThroughPlayers: () => {
+        Array(2 * players.length)
+          .fill(0)
+          .forEach((_, i) => {
+            setTimeout(() => {
+              const el = refs[i % refs.length]
+              const x = el.getBoundingClientRect().left + window.pageXOffset
+
+              // TODO
+              // console.log("scroll through player", x)
+              // // el.scrollIntoView({ behavior: "smooth", block: "start" })
+              // playerCardsContainer.scrollTo({
+              //   left: x,
+              //   behavior: "smooth",
+              // })
+            }, i * 500)
+          })
+      },
       checkIfDealerPok: () => {
         if (isPok(dealer.cards)) {
           setTimeout(() => {
             socket.emit("send_twitch_message", {
               message: `${debug ? "[DEBUG] " : ""}เจ้ามือป๊อก! แดกรอบวง!`,
             })
-          }, 4000)
+          }, 4500)
 
           send("END")
         }
@@ -343,7 +365,7 @@
     {/if}
 
     {#if $state.matches("Waiting")}
-      <p in:fly={{ y: 300 }} class="text-sm ">
+      <p in:fly={{ y: 300 }} class="text-sm">
         {#if debug}<span class="mr-1 bg-red-300 p-1 rounded">DEBUG</span>{/if}[ป๊อกเด้ง] พิมพ์
         <code class="bg-slate-500 text-white rounded p-1">!pok join [จำนวนเงิน]</code>
         เพื่อเข้าร่วม
@@ -378,13 +400,13 @@
       {/if}
     {/if}
   </section>
-  <div class="flex flex-col gap-4">
-    <div class="flex gap-2">
+  <div class="flex flex-col gap-4 w-full overflow-hidden">
+    <div bind:this={playerCardsContainer} class="flex gap-2 w-full overflow-x-scroll">
       {#if players.length > 0}
         <PokdengPlayer player={dealer} isDealer={true} gameState={`${$state.value}`} />
       {/if}
-      {#each players as player}
-        <PokdengPlayer {player} gameState={`${$state.value}`} />
+      {#each players as player, idx}
+        <PokdengPlayer {player} gameState={`${$state.value}`} bind:el={_refs[idx]} />
         <!-- <div class="flex items-center">
           <div class="flex-1">{name}</div>
           <div class="flex-1">{amount}</div>

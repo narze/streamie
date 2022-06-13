@@ -5,10 +5,12 @@
   export let player: IPlayer
   export let gameState: string
   export let isDealer: boolean = false
+  export let el: HTMLElement = null
 </script>
 
 <div
   in:fly={{ x: 300, duration: 800 }}
+  bind:this={el}
   class="flex flex-col border-2 border-white rounded p-1 gap-1 min-w-fit max-w-xs items-center bg-gray-900 bg-opacity-50"
 >
   <span>
