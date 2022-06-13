@@ -1,41 +1,10 @@
 <script lang="ts">
   import { fly } from "svelte/transition"
-  import { cardsToDeng, cardsToScore, isPok, type IPlayer } from "$lib/pokdeng"
+  import { cardToString, handResult, type IPlayer } from "$lib/pokdeng"
 
   export let player: IPlayer
   export let gameState: string
   export let isDealer: boolean = false
-
-  function cardToString(suit: number, value: number) {
-    const suits = ["♠", "♥", "♣", "♦"]
-    const values = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"]
-
-    return `${suits[suit]}${values[value]}`
-  }
-
-  function handResult(player: IPlayer) {
-    const cards = player.cards
-
-    const results: Array<string> = []
-
-    if (isPok(cards)) {
-      results.push("ป๊อก")
-    }
-
-    results.push(`${cardsToScore(cards)}`)
-
-    if (!isPok(cards)) {
-      results.push("แต้ม")
-    }
-
-    const deng = cardsToDeng(cards)
-
-    if (deng > 1) {
-      results.push(`${deng} เด้ง`)
-    }
-
-    return results.join(" ")
-  }
 </script>
 
 <div

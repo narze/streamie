@@ -11,6 +11,7 @@
     calculateResult,
     cardsToDeng,
     cardsToScore,
+    handResult,
     isPok,
     type IPlayer,
     type IPokdengCommand,
@@ -128,9 +129,9 @@
 
         const messages = players.map(
           (player) =>
-            `@${player.name}: ${
+            `@${player.name}: ${handResult(player)} (${
               player.resultAmount > 0 ? `+${player.resultAmount}` : player.resultAmount
-            }`
+            })`
         )
 
         setTimeout(() => {

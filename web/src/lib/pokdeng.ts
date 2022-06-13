@@ -167,3 +167,34 @@ export function calculateResult(dealer: IPlayer, player: IPlayer): number {
 
   return -1
 }
+
+export function cardToString(suit: number, value: number) {
+  const suits = ["♠", "♥", "♣", "♦"]
+  const values = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"]
+
+  return `${suits[suit]}${values[value]}`
+}
+
+export function handResult(player: IPlayer) {
+  const cards = player.cards
+
+  const results: Array<string> = []
+
+  if (isPok(cards)) {
+    results.push("ป๊อก")
+  }
+
+  results.push(`${cardsToScore(cards)}`)
+
+  if (!isPok(cards)) {
+    results.push("แต้ม")
+  }
+
+  const deng = cardsToDeng(cards)
+
+  if (deng > 1) {
+    results.push(`${deng} เด้ง`)
+  }
+
+  return results.join(" ")
+}
