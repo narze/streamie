@@ -40,30 +40,27 @@
 
 <div
   in:fly={{ x: 300, duration: 800 }}
-  class="flex flex-col border-2 rounded px-2 py-1 gap-2 min-w-fit max-w-xs items-center"
+  class="flex flex-col border-2 border-white rounded p-1 gap-1 min-w-fit max-w-xs items-center bg-gray-900 bg-opacity-50"
 >
-  <div class="flex gap-2 justify-center">
-    <span>
-      {player.name}
-      {#if !isDealer}({player.amount}){/if}
-    </span>
-    {#if player.cards.length}
-      <div class="flex gap-1">
-        {#each player.cards as card, idx}
-          <span
-            in:fly={{ y: 300, delay: idx * 300 }}
-            class="text-gray-800 bg-white rounded px-1"
-          >
-            {#if isDealer && gameState === "Playing"}
-              ??
-            {:else}
+  <span>
+    {player.name}
+    {#if !isDealer}({player.amount}){/if}
+  </span>
+  {#if player.cards.length}
+    <div class="flex gap-1">
+      {#each player.cards as card, idx}
+        <span in:fly={{ y: 300, delay: idx * 300 }} class="bg-white rounded px-1">
+          {#if isDealer && gameState === "Playing"}
+            <span class="text-black">??</span>
+          {:else}
+            <span class={`${card.suit % 2 == 0 ? "text-black" : "text-[#FF0000]"}`}>
               {cardToString(card.suit, card.value)}
-            {/if}
-          </span>
-        {/each}
-      </div>
-    {/if}
-  </div>
+            </span>
+          {/if}
+        </span>
+      {/each}
+    </div>
+  {/if}
 
   {#if isDealer}
     {#if gameState == "Ending"}

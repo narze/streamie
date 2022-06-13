@@ -16,6 +16,7 @@
     type IPokdengCommand,
   } from "$lib/pokdeng"
   import PokdengPlayer from "$lib/components/PokdengPlayer.svelte"
+  import { page } from "$app/stores"
 
   const SECONDS_PER_STATE = 30
   const DEBUG = false
@@ -31,6 +32,7 @@
   let gameRestartAt: Dayjs | null
   let countdownTimer: number
   let tickInterval
+  let debug: boolean
 
   // $: playersCanDraw = players.map((_player, idx) => {
   //   if (!$state.matches("Playing")) {
@@ -105,9 +107,11 @@
       },
       checkIfDealerPok: () => {
         if (isPok(dealer.cards)) {
-          socket.emit("send_twitch_message", {
-            message: "เจ้ามือป๊อก! แดกรอบวง!",
-          })
+          setTimeout(() => {
+            socket.emit("send_twitch_message", {
+              message: `${debug ? "[DEBUG] " : ""}เจ้ามือป๊อก! แดกรอบวง!`,
+            })
+          }, 4000)
 
           send("END")
         }
@@ -131,13 +135,15 @@
 
         setTimeout(() => {
           socket.emit("send_twitch_message", {
-            message: "ผลป๊อกเด้ง: " + messages.join(" | "),
+            message: `${debug ? "[DEBUG] " : ""}ผลป๊อกเด้ง: ${messages.join(" | ")}`,
           })
-        }, 1500)
+        }, 5000)
 
-        await socket.emit("pokdeng_payout", {
-          players,
-        })
+        if (!debug) {
+          await socket.emit("pokdeng_payout", {
+            players,
+          })
+        }
       },
     },
   }
@@ -157,6 +163,8 @@
   }
 
   onMount(() => {
+    debug = !!$page.url.searchParams.get("debug")
+
     window["command"] = onCommand
 
     socket.on("pokdeng", async (args: IPokdengCommand) => {
@@ -310,7 +318,11 @@
   }
 </script>
 
-<main class="font-sans p-2 min-h-screen w-full flex flex-col items-start gap-2">
+<main
+  class={`font-sans p-2 min-h-screen w-full flex flex-col items-start gap-2 text-white ${
+    debug ? "bg-gray-800" : ""
+  }`}
+>
   <!-- <h1 class="text-3xl text-black">ป๊อกเด้ง</h1> -->
 
   <!-- <input
@@ -320,16 +332,17 @@
     on:keydown={sendCommand}
   /> -->
 
-  <section class="p-2 flex flex-col gap-2 border-2 border-white rounded items-center">
+  <section
+    class="p-2 flex flex-col gap-2 border-2 border-white rounded items-center bg-gray-900 bg-opacity-50"
+  >
     {#if DEBUG}
       State: {$state.value}
     {/if}
 
     {#if $state.matches("Waiting")}
-      <p in:fly={{ y: 300 }} class="text-sm">
-        [ป๊อกเด้ง] พิมพ์ <code class="bg-slate-500 text-white rounded p-1"
-          >!pok join [จำนวนเงิน]</code
-        >
+      <p in:fly={{ y: 300 }} class="text-sm ">
+        {#if debug}<span class="mr-1 bg-red-300 p-1 rounded">DEBUG</span>{/if}[ป๊อกเด้ง] พิมพ์
+        <code class="bg-slate-500 text-white rounded p-1">!pok join [จำนวนเงิน]</code>
         เพื่อเข้าร่วม
       </p>
       {#if countdownTimer != undefined}
