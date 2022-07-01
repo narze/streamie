@@ -55,6 +55,9 @@ export function isSamLueng(cards: Array<ICard>): boolean {
   }
   return false
 }
+export function isFlush(cards: Array<ICard>): boolean {
+  return cards.length == 3 && cards[0].suit == cards[1].suit && cards[1].suit == cards[2].suit
+}
 
 export function isStraight(values: Array<string>): boolean {
   if (values.length !== 3) {
@@ -75,6 +78,10 @@ export function isStraight(values: Array<string>): boolean {
   }
 
   return false
+}
+
+export function isStraightFlush(cards: Array<ICard>) {
+  return isFlush(cards) && isStraight(cards.map((card) => values[card.value]))
 }
 
 export function cardsToDeng(cards: Array<ICard>): number {
@@ -143,6 +150,14 @@ export function calculateResult(dealer: IPlayer, player: IPlayer): number {
 
   if (isThreeOfAKind(dealer.cards) && !isThreeOfAKind(player.cards)) {
     return -player.amount * 5
+  }
+  
+  if (isStraightFlush(player.cards) && !isStraightFlush(dealer.cards)) {
+    return player.amount * 5
+  }
+
+  if (!isStraightFlush(player.cards) && isStraightFlush(dealer.cards)) {
+    return player.amount * -5
   }
 
   if (
