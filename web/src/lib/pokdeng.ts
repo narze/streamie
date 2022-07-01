@@ -1,3 +1,5 @@
+const values = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"]
+const suits = ["♠", "♥", "♣", "♦"]
 export interface IPlayer {
   name: string
   amount: number
@@ -76,8 +78,6 @@ export function isStraight(values: Array<string>): boolean {
 }
 
 export function cardsToDeng(cards: Array<ICard>): number {
-  const values = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"]
-  const suits = ["♠", "♥", "♣", "♦"]
   const cardValues = cards.map((card) => values[card.value])
   const cardSuits = cards.map((card) => suits[card.suit])
 
@@ -145,6 +145,20 @@ export function calculateResult(dealer: IPlayer, player: IPlayer): number {
     return -player.amount * 5
   }
 
+  if (
+    isStraight(player.cards.map((card) => values[card.value])) &&
+    !isStraight(dealer.cards.map((card) => values[card.value]))
+  ) {
+    return player.amount * 3
+  }
+
+  if (
+    !isStraight(player.cards.map((card) => values[card.value])) &&
+    isStraight(dealer.cards.map((card) => values[card.value]))
+  ) {
+    return player.amount * -3
+  }
+
   if (!isSamLueng(dealer.cards) && isSamLueng(player.cards)) {
     return player.amount * 3
   }
@@ -169,9 +183,6 @@ export function calculateResult(dealer: IPlayer, player: IPlayer): number {
 }
 
 export function cardToString(suit: number, value: number) {
-  const suits = ["♠", "♥", "♣", "♦"]
-  const values = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"]
-
   return `${suits[suit]}${values[value]}`
 }
 

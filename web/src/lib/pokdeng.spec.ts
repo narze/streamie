@@ -139,6 +139,13 @@ describe("calculateResult", () => {
 
       expect(calculateResult(dealer, player)).toBe(-30)
     })
+
+    it("multiplies lose with 3 Deng, if player loses", () => {
+      const dealer: IPlayer = playerGenerator(0, ["♣7", "♦8", "♥9"])
+      const player: IPlayer = playerGenerator(10, ["♦6", "♦A"])
+
+      expect(calculateResult(dealer, player)).toBe(-30)
+    })
   })
 })
 
