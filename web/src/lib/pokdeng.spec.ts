@@ -70,10 +70,23 @@ describe("calculateResult", () => {
 
   describe("both Pok", () => {
     it("results in a draw", () => {
-      const dealer: IPlayer = playerGenerator(0, ["♦7", "♣A"])
+      const dealer: IPlayer = playerGenerator(0, ["♦7", "♣2"])
       const player: IPlayer = playerGenerator(10, ["♣7", "♦2"])
 
       expect(calculateResult(dealer, player)).toBe(0)
+    })
+    it("Pok 9 win Pok 8 results in a player wins", () => {
+      const dealer: IPlayer = playerGenerator(0, ["♦7", "♣A"])
+      const player: IPlayer = playerGenerator(10, ["♣7", "♦2"])
+
+      expect(calculateResult(dealer, player)).toBe(10)
+    })
+
+    it("Pok 9 win Pok 8 results in a player wins with Deng", () => {
+      const dealer: IPlayer = playerGenerator(0, ["♦7", "♣A"])
+      const player: IPlayer = playerGenerator(10, ["♣7", "♣2"])
+
+      expect(calculateResult(dealer, player)).toBe(20)
     })
   })
 
