@@ -11,7 +11,7 @@
   $: text = $svelteStore.data["text"] || " "
 
   onMount(() => {
-    const socket = io("ws://streamie-socket.narze.live")
+    const socket = io("wss://streamie-socket.narze.live")
 
     socket.on("doing", ({ message }) => {
       $svelteStore.data["text"] = message

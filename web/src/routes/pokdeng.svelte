@@ -23,7 +23,7 @@
   $: SECONDS_PER_STATE = debug ? 5 : 30
   const DEBUG = false
 
-  const socket = io("ws://streamie-socket.narze.live")
+  const socket = io("wss://streamie-socket.narze.live")
 
   // let command = ""
   let dealer: IPlayer = { name: "เจ้ามือ", amount: 0, cards: [] }

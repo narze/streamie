@@ -36,7 +36,7 @@
   }
 
   function connectSocket() {
-    const socket = io("ws://streamie-socket.narze.live")
+    const socket = io("wss://streamie-socket.narze.live")
 
     socket.on("place", ({ x, y, c }) => {
       console.log({ x, y, c })

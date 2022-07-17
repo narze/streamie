@@ -8,7 +8,7 @@
   import { useMachine } from "$lib/useMachine"
   import axios from "axios"
 
-  const socket = io("ws://streamie-socket.narze.live")
+  const socket = io("wss://streamie-socket.narze.live")
 
   const DEFAULT_WORK_TIMER = 60 * 25
   const DEFAULT_BREAK_TIMER = 60 * 5
