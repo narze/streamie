@@ -60,6 +60,7 @@
     "qs": "^6.11.0",
     "redis": "^4.2.0",
     "socket.io-client": "^4.5.1",
+    "svelte-local-storage-store": "^0.2.6",
     "xstate": "^4.32.1",
     "y-indexeddb": "^9.0.8",
     "y-webrtc": "^10.2.3",

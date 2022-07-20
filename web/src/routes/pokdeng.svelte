@@ -5,6 +5,7 @@
   import dayjs from "dayjs"
   import type { Dayjs } from "dayjs"
   import { fly } from "svelte/transition"
+  import { writable } from "svelte-local-storage-store"
 
   import { useMachine } from "$lib/useMachine"
   import {
@@ -24,10 +25,14 @@
 
   const socket = io("wss://streamie-socket.narze.live")
 
+  export const store = writable("pokdengStore", {
+    dealerBalance: 0,
+  })
+
   // let command = ""
   let dealer: IPlayer = { name: "เจ้ามือ", amount: 0, cards: [] }
   let players: Array<IPlayer> = []
-  let dealerBalance: number = 0
+  $: dealerBalance = $store.dealerBalance
 
   let gameStartAt: Dayjs | null
   let gameEndAt: Dayjs | null
@@ -163,7 +168,12 @@
       calculateAndPayout: async () => {
         players = players.map((player) => {
           const resultAmount = calculateResult(dealer, player)
-          dealerBalance -= resultAmount
+          store.update(({ dealerBalance }) => {
+            return {
+              dealerBalance: dealerBalance - resultAmount,
+            }
+          })
+
           return { ...player, resultAmount }
         })
 
