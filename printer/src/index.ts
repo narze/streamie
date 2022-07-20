@@ -14,7 +14,7 @@ interface ServerToClientEvents {
 interface ClientToServerEvents {}
 
 const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(
-  'ws://streamie-socket.narze.live'
+  'wss://streamie-socket.narze.live'
 );
 
 let printQueue: string[] = [];
