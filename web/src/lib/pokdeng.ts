@@ -1,3 +1,5 @@
+const values = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"]
+const suits = ["♠", "♥", "♣", "♦"]
 export interface IPlayer {
   name: string
   amount: number
@@ -53,6 +55,9 @@ export function isSamLueng(cards: Array<ICard>): boolean {
   }
   return false
 }
+export function isFlush(cards: Array<ICard>): boolean {
+  return cards.length == 3 && cards[0].suit == cards[1].suit && cards[1].suit == cards[2].suit
+}
 
 export function isStraight(values: Array<string>): boolean {
   if (values.length !== 3) {
@@ -75,9 +80,11 @@ export function isStraight(values: Array<string>): boolean {
   return false
 }
 
+export function isStraightFlush(cards: Array<ICard>) {
+  return isFlush(cards) && isStraight(cards.map((card) => values[card.value]))
+}
+
 export function cardsToDeng(cards: Array<ICard>): number {
-  const values = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"]
-  const suits = ["♠", "♥", "♣", "♦"]
   const cardValues = cards.map((card) => values[card.value])
   const cardSuits = cards.map((card) => suits[card.suit])
 
@@ -151,6 +158,28 @@ export function calculateResult(dealer: IPlayer, player: IPlayer): number {
     return -player.amount * 5
   }
 
+  if (isStraightFlush(player.cards) && !isStraightFlush(dealer.cards)) {
+    return player.amount * 5
+  }
+
+  if (!isStraightFlush(player.cards) && isStraightFlush(dealer.cards)) {
+    return player.amount * -5
+  }
+
+  if (
+    isStraight(player.cards.map((card) => values[card.value])) &&
+    !isStraight(dealer.cards.map((card) => values[card.value]))
+  ) {
+    return player.amount * 3
+  }
+
+  if (
+    !isStraight(player.cards.map((card) => values[card.value])) &&
+    isStraight(dealer.cards.map((card) => values[card.value]))
+  ) {
+    return player.amount * -3
+  }
+
   if (!isSamLueng(dealer.cards) && isSamLueng(player.cards)) {
     return player.amount * 3
   }
@@ -175,9 +204,6 @@ export function calculateResult(dealer: IPlayer, player: IPlayer): number {
 }
 
 export function cardToString(suit: number, value: number) {
-  const suits = ["♠", "♥", "♣", "♦"]
-  const values = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"]
-
   return `${suits[suit]}${values[value]}`
 }
 
@@ -185,6 +211,22 @@ export function handResult(player: IPlayer) {
   const cards = player.cards
 
   const results: Array<string> = []
+
+  if (isThreeOfAKind(cards)) {
+    return "ตอง (5 เด้ง)"
+  }
+
+  if (isStraightFlush(cards)) {
+    return "เรียง (5 เด้ง)"
+  }
+
+  if (isSamLueng(cards)) {
+    return "สามเหลือง"
+  }
+
+  if (isStraight(cards.map((card) => values[card.value]))) {
+    return "เรียง (3 เด้ง)"
+  }
 
   if (isPok(cards)) {
     results.push("ป๊อก")
