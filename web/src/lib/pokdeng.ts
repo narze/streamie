@@ -151,7 +151,7 @@ export function calculateResult(dealer: IPlayer, player: IPlayer): number {
   if (isThreeOfAKind(dealer.cards) && !isThreeOfAKind(player.cards)) {
     return -player.amount * 5
   }
-  
+
   if (isStraightFlush(player.cards) && !isStraightFlush(dealer.cards)) {
     return player.amount * 5
   }
@@ -205,6 +205,22 @@ export function handResult(player: IPlayer) {
   const cards = player.cards
 
   const results: Array<string> = []
+
+  if (isThreeOfAKind(cards)) {
+    return "ตอง (5 เด้ง)"
+  }
+
+  if (isStraightFlush(cards)) {
+    return "เรียง (5 เด้ง)"
+  }
+
+  if (isSamLueng(cards)) {
+    return "สามเหลือง"
+  }
+
+  if (isStraight(cards.map((card) => values[card.value]))) {
+    return "เรียง (3 เด้ง)"
+  }
 
   if (isPok(cards)) {
     results.push("ป๊อก")
