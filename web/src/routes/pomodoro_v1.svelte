@@ -54,7 +54,7 @@
 
     window["command"] = onCommand
 
-    const socket = io("ws://streamie-socket.narze.live")
+    const socket = io("wss://streamie-socket.narze.live")
 
     socket.on("pomodoro", ({ minutes, command }) => {
       onCommand(command, minutes)

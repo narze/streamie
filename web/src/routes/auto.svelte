@@ -9,7 +9,7 @@
   let autoread = true
 
   onMount(() => {
-    const socket = io("ws://streamie-socket.narze.live")
+    const socket = io("wss://streamie-socket.narze.live")
 
     socket.on("say", ({ message, username, language, slow }) => {
       messages = [...messages, `${username}: ${message} (${language ?? "th"})`]

@@ -5,6 +5,7 @@
   import dayjs from "dayjs"
   import type { Dayjs } from "dayjs"
   import { fly } from "svelte/transition"
+  import { writable } from "svelte-local-storage-store"
 
   import { useMachine } from "$lib/useMachine"
   import {
@@ -21,13 +22,17 @@
 
   let debug: boolean
   $: SECONDS_PER_STATE = debug ? 5 : 30
-  const DEBUG = false
 
-  const socket = io("ws://streamie-socket.narze.live")
+  const socket = io("wss://streamie-socket.narze.live")
+
+  export const store = writable("pokdengStore", {
+    dealerBalance: 0,
+  })
 
   // let command = ""
   let dealer: IPlayer = { name: "เจ้ามือ", amount: 0, cards: [] }
   let players: Array<IPlayer> = []
+  $: dealerBalance = $store.dealerBalance
 
   let gameStartAt: Dayjs | null
   let gameEndAt: Dayjs | null
@@ -163,6 +168,12 @@
       calculateAndPayout: async () => {
         players = players.map((player) => {
           const resultAmount = calculateResult(dealer, player)
+          store.update(({ dealerBalance }) => {
+            return {
+              dealerBalance: dealerBalance - resultAmount,
+            }
+          })
+
           return { ...player, resultAmount }
         })
 
@@ -175,13 +186,13 @@
 
         messages.push(`เจ้ามือ: ${handResult(dealer)}`)
 
-        setTimeout(() => {
-          socket.emit("send_twitch_message", {
-            message: `${debug ? "[DEBUG] " : ""}ผลป๊อกเด้ง: ${messages.join(" | ")}`,
-          })
-        }, 5000)
-
         if (!debug) {
+          setTimeout(() => {
+            socket.emit("send_twitch_message", {
+              message: `${debug ? "[DEBUG] " : ""}ผลป๊อกเด้ง: ${messages.join(" | ")}`,
+            })
+          }, 5000)
+
           await socket.emit("pokdeng_payout", {
             players,
           })
@@ -381,48 +392,53 @@
     on:keydown={sendCommand}
   /> -->
 
-  <section
-    class="p-2 flex flex-col gap-2 border-2 border-white rounded items-center bg-gray-900 bg-opacity-50"
-  >
-    {#if DEBUG}
-      State: {$state.value}
-    {/if}
+  <section class="flex gap-2">
+    <div
+      class="p-2 flex flex-col gap-2 border-2 border-white rounded items-center bg-gray-900 bg-opacity-50"
+    >
+      {#if debug}
+        State: {$state.value}
+      {/if}
 
-    {#if $state.matches("Waiting")}
-      <p in:fly={{ y: 300 }} class="text-sm">
-        {#if debug}<span class="mr-1 bg-red-300 p-1 rounded">DEBUG</span>{/if}[ป๊อกเด้ง] พิมพ์
-        <code class="bg-slate-500 text-white rounded p-1">!pok join [จำนวนเงิน]</code>
-        เพื่อเข้าร่วม
-      </p>
-      {#if countdownTimer != undefined}
-        <div class="text-sm">
-          เริ่มใน {countdownTimer} วินาที
-        </div>
-      {/if}
-      {#if DEBUG}
-        <button class="btn btn-primary" on:click={() => send("START")}> Start </button>
-      {/if}
-    {:else if $state.matches("Playing")}
-      <p>
-        พิมพ์ <code class="bg-slate-500 text-white rounded p-1">!pok draw</code>
-        เพื่อจั่วเพิ่ม
+      {#if $state.matches("Waiting")}
+        <p in:fly={{ y: 300 }} class="text-sm">
+          {#if debug}<span class="mr-1 bg-red-300 p-1 rounded">DEBUG</span>{/if}[ป๊อกเด้ง] พิมพ์
+          <code class="bg-slate-500 text-white rounded p-1">!pok join [จำนวนเงิน]</code>
+          เพื่อเข้าร่วม
+        </p>
         {#if countdownTimer != undefined}
-          <span>(นับแต้มใน {countdownTimer} วินาที)</span>
+          <div class="text-sm">
+            เริ่มใน {countdownTimer} วินาที
+          </div>
         {/if}
-      </p>
-      {#if DEBUG}
-        <button class="btn btn-primary" on:click={() => send("END")}> End </button>
+        {#if debug}
+          <button class="btn btn-primary" on:click={() => send("START")}> Start </button>
+        {/if}
+      {:else if $state.matches("Playing")}
+        <p>
+          พิมพ์ <code class="bg-slate-500 text-white rounded p-1">!pok draw</code>
+          เพื่อจั่วเพิ่ม
+          {#if countdownTimer != undefined}
+            <span>(นับแต้มใน {countdownTimer} วินาที)</span>
+          {/if}
+        </p>
+        {#if debug}
+          <button class="btn btn-primary" on:click={() => send("END")}> End </button>
+        {/if}
+      {:else if $state.matches("Ending")}
+        {#if countdownTimer != undefined}
+          <div>
+            เริ่มใหม่ใน {countdownTimer} วินาที
+          </div>
+        {/if}
+        {#if debug}
+          <button class="btn btn-primary" on:click={() => send("RESTART")}> Restart </button>
+        {/if}
       {/if}
-    {:else if $state.matches("Ending")}
-      {#if countdownTimer != undefined}
-        <div>
-          เริ่มใหม่ใน {countdownTimer} วินาที
-        </div>
-      {/if}
-      {#if DEBUG}
-        <button class="btn btn-primary" on:click={() => send("RESTART")}> Restart </button>
-      {/if}
-    {/if}
+    </div>
+    <div class="p-2 border-2 border-white rounded flex items-center bg-gray-900 bg-opacity-50">
+      ผลประกอบการ: {`${dealerBalance > 0 ? "+" : ""}${dealerBalance}`}
+    </div>
   </section>
   <div class="flex flex-col gap-4 w-full overflow-hidden">
     <div bind:this={playerCardsContainer} class="flex gap-2 w-full overflow-x-scroll">
@@ -440,7 +456,7 @@
           <div class="flex-1">Score: {cardsToScore(cards)}</div>
           <div class="flex-1">ป๊อก: {isPok(cards)}</div>
           <div class="flex-1">เด้ง: {cardsToDeng(cards)}</div>
-          {#if DEBUG && playersCanDraw[idx]}
+          {#if debug && playersCanDraw[idx]}
             <button class="btn btn-primary" on:click={() => drawCard(name)}> จั่วเพิ่ม </button>
           {/if}
           {#if resultAmount != undefined}
@@ -450,7 +466,7 @@
       {/each}
     </div>
 
-    {#if DEBUG && dealerCanDraw}
+    {#if debug && dealerCanDraw}
       <button class="btn btn-primary" on:click={() => dealerDrawCard()}> จั่วเพิ่ม </button>
     {/if}
   </div>
