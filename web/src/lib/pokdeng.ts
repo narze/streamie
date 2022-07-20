@@ -134,6 +134,12 @@ export function calculateResult(dealer: IPlayer, player: IPlayer): number {
   }
 
   if (isPok(dealer.cards) && isPok(player.cards)) {
+    if (dealerScore < playerScore) {
+      return player.amount * cardsToDeng(player.cards)
+    }
+    if (dealerScore > playerScore) {
+      return -player.amount * cardsToDeng(dealer.cards)
+    }
     return 0
   }
 
