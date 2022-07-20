@@ -75,6 +75,7 @@ describe("calculateResult", () => {
 
       expect(calculateResult(dealer, player)).toBe(0)
     })
+
     it("Pok 9 win Pok 8 results in a player wins", () => {
       const dealer: IPlayer = playerGenerator(0, ["♦7", "♣A"])
       const player: IPlayer = playerGenerator(10, ["♣7", "♦2"])
@@ -87,6 +88,20 @@ describe("calculateResult", () => {
       const player: IPlayer = playerGenerator(10, ["♣7", "♣2"])
 
       expect(calculateResult(dealer, player)).toBe(20)
+    })
+
+    it("Pok 9 win Pok 8 results in a dealer wins", () => {
+      const dealer: IPlayer = playerGenerator(0, ["♣7", "♦2"])
+      const player: IPlayer = playerGenerator(10, ["♦7", "♣A"])
+
+      expect(calculateResult(dealer, player)).toBe(-10)
+    })
+
+    it("Pok 9 win Pok 8 results in a dealer wins with Deng", () => {
+      const dealer: IPlayer = playerGenerator(0, ["♣7", "♣2"])
+      const player: IPlayer = playerGenerator(10, ["♦7", "♣A"])
+
+      expect(calculateResult(dealer, player)).toBe(-20)
     })
   })
 
