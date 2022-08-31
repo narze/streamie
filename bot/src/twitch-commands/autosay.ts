@@ -1,6 +1,6 @@
 import { ITwitchCommand } from "../../types"
 
-let autosayEnabled = false
+let autosayEnabled = true
 
 export function isAutosayEnabled(): boolean {
   return autosayEnabled
