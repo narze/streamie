@@ -2,7 +2,7 @@ import { ITwitchCommand } from "../../types"
 import prisma from "../prisma"
 
 const pokdeng: ITwitchCommand = {
-  name: "!pok",
+  name: ["!pok", "!p"],
   execute: async (client, channel, tags, message, misc) => {
     const name = tags.username!.toLowerCase()
 
