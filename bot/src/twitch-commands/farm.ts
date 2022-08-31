@@ -37,6 +37,10 @@ const farm: ITwitchCommand = {
 
     let farmAmount = 5 + Math.ceil(Math.random() * 10)
 
+    if (!!tags.subscriber) {
+      farmAmount *= 2
+    }
+
     const user = await upsertUser(name, id)
 
     // check if farmedAt is not null
@@ -59,7 +63,12 @@ const farm: ITwitchCommand = {
           data: { farmedAt: new Date(), coin: { increment: farmAmount } },
         })
 
-        await client.say(channel, `@${name} ฟาร์มได้ ${farmAmount} $OULONG`)
+        await client.say(
+          channel,
+          `@${name} ฟาร์มได้ ${farmAmount} $OULONG${
+            !!tags.subscriber ? " (x2 sub bonus)" : ""
+          }`
+        )
       }
 
       return
