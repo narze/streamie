@@ -45,6 +45,6 @@ module.exports = {
     //   "https://cdn.shopify.com/s/files/1/1955/3977/products/stonl_800x.png"
     // )
 
-    await interaction.reply({ embeds: [embed], ephemeral: true })
+    await interaction.reply({ embeds: [embed], ephemeral: false })
   },
 }

@@ -25,11 +25,11 @@
 
   const socket = io("wss://streamie-socket.narze.live")
 
+  // TODO: Reset balance
   export const store = writable("pokdengStore", {
     dealerBalance: 0,
   })
 
-  // let command = ""
   let dealer: IPlayer = { name: "เจ้ามือ", amount: 0, cards: [] }
   let players: Array<IPlayer> = []
   $: dealerBalance = $store.dealerBalance
