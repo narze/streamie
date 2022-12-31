@@ -1,24 +1,20 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider        = "prisma-client-js"
-  previewFeatures = ["cockroachdb"]
+  previewFeatures = []
 }
 
 datasource db {
-  // provider = "postgresql"{}
   provider = "cockroachdb"
   url      = env("DATABASE_URL")
 }
 
 model User {
   id        String    @id(map: "primary") @default(uuid())
-  name      String    @unique @db.VarChar()
-  coin      Int       @default(0) @db.Integer()
-  farmedAt  DateTime? @db.Timestamptz()
-  twitchId  String?   @db.VarChar()
-  discordId String?   @db.VarChar()
+  name      String    @unique
+  coin      Int       @default(0)
+  farmedAt  DateTime? @db.Timestamptz(6)
+  discordId String?
+  twitchId  String?
 
   @@index([name])
   @@index([coin])
