@@ -2,7 +2,7 @@ import qs from "qs"
 const DISCORD_CLIENT_ID = import.meta.env.VITE_DISCORD_CLIENT_ID
 const DISCORD_CLIENT_SECRET = import.meta.env.VITE_DISCORD_CLIENT_SECRET
 
-export async function get({ url }) {
+export async function GET({ url }) {
   const refresh_token = url.searchParams.get("refresh_token")
 
   if (!refresh_token) {

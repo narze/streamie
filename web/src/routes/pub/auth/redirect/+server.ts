@@ -5,7 +5,7 @@ const DISCORD_CLIENT_ID = import.meta.env.VITE_DISCORD_CLIENT_ID
 const DISCORD_CLIENT_SECRET = import.meta.env.VITE_DISCORD_CLIENT_SECRET
 const DISCORD_OAUTH_REDIRECT_URI = import.meta.env.VITE_DISCORD_OAUTH_REDIRECT_URI
 
-export async function get({ url }) {
+export async function GET({ url }) {
   const authCode = url.searchParams.get("code")
 
   const data = qs.stringify({
@@ -37,28 +37,30 @@ export async function get({ url }) {
   const refresh_token_expires_in = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days,
 
   // redirect user to front page with cookies set
-  return {
-    headers: {
-      // Location: '/', // Use refresh instead of redirect to make cookie available
-      refresh: `0; url=/pub`,
-      "Set-Cookie": [
-        serialize("access_token", response.access_token, {
-          path: "/",
-          httpOnly: true,
-          sameSite: "strict",
-          secure: process.env.NODE_ENV === "production",
-          expires: access_token_expires_in,
-        }),
-        serialize("refresh_token", response.refresh_token, {
-          path: "/",
-          httpOnly: true,
-          sameSite: "strict",
-          secure: process.env.NODE_ENV === "production",
-          expires: refresh_token_expires_in,
-        }),
-      ],
-    },
-    status: 302,
-    body: "", // Show blank page before refresh
-  }
+  const responseObj = new Response()
+  responseObj.headers.set("refresh", `0; url=/pub`)
+  responseObj.headers.append(
+    "Set-Cookie",
+    serialize("access_token", response.access_token, {
+      path: "/",
+      httpOnly: true,
+      sameSite: "strict",
+      secure: process.env.NODE_ENV === "production",
+      expires: access_token_expires_in,
+    })
+  )
+  responseObj.headers.append(
+    "Set-Cookie",
+    serialize("refresh_token", response.refresh_token, {
+      path: "/",
+      httpOnly: true,
+      sameSite: "strict",
+      secure: process.env.NODE_ENV === "production",
+      expires: refresh_token_expires_in,
+    })
+  )
+
+  console.log(responseObj.headers)
+
+  return responseObj
 }

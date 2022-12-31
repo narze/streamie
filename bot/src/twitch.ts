@@ -96,6 +96,8 @@ export default function twitch() {
   client.on("message", async (channel, tags, message, self) => {
     if (self) return
 
+    console.dir({ tags })
+
     const isCommaCommand = message.startsWith(",")
     const isBangCommand = message.startsWith("!")
 

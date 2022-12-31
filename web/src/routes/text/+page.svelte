@@ -6,7 +6,7 @@
   export const prerender = false
   export const ssr = false
 
-  import { svelteStore, connectRoom } from "../lib/synced-store"
+  import { svelteStore, connectRoom } from "$lib/synced-store"
 
   $: text = $svelteStore.data["text"] || " "
 

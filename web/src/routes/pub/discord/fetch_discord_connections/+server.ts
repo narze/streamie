@@ -3,7 +3,7 @@ import cookie from "cookie"
 
 const DISCORD_API_URL = "https://discord.com/api"
 
-export const get: RequestHandler = async (event) => {
+export const GET: RequestHandler = async (event) => {
   const cookies = cookie.parse(event.request.headers.get("cookie") || "")
 
   const accessToken = cookies.access_token
@@ -14,5 +14,5 @@ export const get: RequestHandler = async (event) => {
 
   const data = await request.json()
 
-  return { body: data }
+  return new Response(data)
 }

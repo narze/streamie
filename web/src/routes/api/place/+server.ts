@@ -1,6 +1,6 @@
 import { createClient } from "redis"
 
-export async function get({ url }) {
+export async function GET({ url }) {
   const redisUrl = "redis://redis.streamie.homelab.narze.live:56379"
   const redisClient = createClient({
     url: redisUrl,

@@ -1,7 +1,7 @@
 <script context="module" lang="ts">
   export const prerender = false // Force getSession even if using node adapter
 
-  import { browser } from "$app/env"
+  import { browser } from "$app/environment"
   import type { Load } from "@sveltejs/kit"
 
   const DISCORD_CLIENT_ID = import.meta.env.VITE_DISCORD_CLIENT_ID
@@ -10,23 +10,27 @@
 
   const authUrl = `https://discord.com/api/oauth2/authorize?client_id=${DISCORD_CLIENT_ID}&redirect_uri=${DISCORD_OAUTH_REDIRECT_URI}&response_type=code&scope=identify%20connections`
 
-  export const load: Load = async ({ session, fetch }) => {
-    // Receives refreshed tokens from session & store it to httpOnly cookie
-    if (session["tokens"] && browser) {
-      await fetch("/pub/store_session", {
-        method: "POST",
-        body: JSON.stringify(session["tokens"]),
-      })
-    }
+  export const load: Load = async ({ fetch }) => {
+    // FIXME: Session is removed from v1
 
-    return {
-      props: { user: session["user"] || false },
-    }
+    // // Receives refreshed tokens from session & store it to httpOnly cookie
+    // if (session["tokens"] && browser) {
+    //   await fetch("/pub/store_session", {
+    //     method: "POST",
+    //     body: JSON.stringify(session["tokens"]),
+    //   })
+    // }
+
+    // return {
+    //   props: { user: session["user"] || false },
+    // }
+
+    return { props: {} }
   }
 </script>
 
 <script lang="ts">
-  import { session } from "$app/stores"
+  // import { session } from "$app/stores"
   export let user
 
   $: if (user && browser) {
@@ -75,7 +79,7 @@
 
     <h3>Session Data</h3>
 
-    <pre>{JSON.stringify($session["user"], null, 2)}</pre>
+    <!-- <pre>{JSON.stringify($session["user"], null, 2)}</pre> -->
 
     <p><a href="/pub/logout">Log Out</a></p>
   {:else}
